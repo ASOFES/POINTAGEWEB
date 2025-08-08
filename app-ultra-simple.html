@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TimeSheet Web - Version Ultra Simple</title>
+    <title>TimeSheet Web - Pointage Détaillé</title>
     <style>
         * {
             margin: 0;
@@ -181,6 +181,11 @@
             color: white;
         }
 
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -284,6 +289,62 @@
             background: #c82333;
         }
 
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #1976D2;
+            color: white;
+            border-color: #1976D2;
+        }
+
+        .search-box {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 200px;
+            margin-left: auto;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h4 {
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -300,6 +361,15 @@
             .scanner-controls {
                 flex-direction: column;
                 align-items: center;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+                margin-left: 0;
             }
         }
     </style>
@@ -323,6 +393,7 @@
             <button class="nav-tab active" onclick="showSection('dashboard')">🏠 Tableau de bord</button>
             <button class="nav-tab" onclick="showSection('scanner')">📷 Scanner QR</button>
             <button class="nav-tab" onclick="showSection('history')">📊 Historique</button>
+            <button class="nav-tab" onclick="showSection('reports')">📈 Rapports</button>
             <button class="nav-tab" onclick="showSection('profile')">👤 Profil</button>
         </div>
 
@@ -339,6 +410,11 @@
                     <div class="card-icon">📊</div>
                     <h3>Historique</h3>
                     <p>Consultez vos pointages</p>
+                </div>
+                <div class="card" onclick="showSection('reports')">
+                    <div class="card-icon">📈</div>
+                    <h3>Rapports</h3>
+                    <p>Analyses détaillées</p>
                 </div>
                 <div class="card" onclick="showSection('profile')">
                     <div class="card-icon">👤</div>
@@ -364,22 +440,87 @@
         <!-- History Section -->
         <div id="history-section" class="section">
             <h2>📊 Historique des Pointages</h2>
+            
+            <!-- Filtres -->
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterHistory('all')">Tous</button>
+                <button class="filter-btn" onclick="filterHistory('today')">Aujourd'hui</button>
+                <button class="filter-btn" onclick="filterHistory('week')">Cette semaine</button>
+                <button class="filter-btn" onclick="filterHistory('month')">Ce mois</button>
+                <input type="text" class="search-box" placeholder="Rechercher..." onkeyup="searchHistory(this.value)">
+            </div>
+
             <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                 <button class="btn btn-success" onclick="refreshData()">🔄 Actualiser</button>
-                <button class="btn btn-success" onclick="exportHistory()">📥 Exporter</button>
+                <button class="btn btn-primary" onclick="exportHistory()">📥 Exporter</button>
             </div>
+
             <table class="history-table">
                 <thead>
                     <tr>
                         <th>Date</th>
+                        <th>Heure Entrée</th>
+                        <th>Heure Sortie</th>
+                        <th>Heures Prestées</th>
                         <th>Code</th>
-                        <th>Type</th>
                         <th>Statut</th>
                     </tr>
                 </thead>
                 <tbody id="historyTableBody">
                     <tr>
-                        <td colspan="4" style="text-align: center; color: #666;">Aucun pointage trouvé</td>
+                        <td colspan="6" style="text-align: center; color: #666;">Aucun pointage trouvé</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reports-section" class="section">
+            <h2>📈 Rapports Détaillés</h2>
+            
+            <!-- Résumé -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h4>Heures Aujourd'hui</h4>
+                    <div class="value" id="hoursToday">0h</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Heures Cette Semaine</h4>
+                    <div class="value" id="hoursWeek">0h</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Heures Ce Mois</h4>
+                    <div class="value" id="hoursMonth">0h</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Total Pointages</h4>
+                    <div class="value" id="totalEntries">0</div>
+                </div>
+            </div>
+
+            <!-- Filtres pour rapports -->
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterReports('all')">Tous</button>
+                <button class="filter-btn" onclick="filterReports('today')">Aujourd'hui</button>
+                <button class="filter-btn" onclick="filterReports('week')">Cette semaine</button>
+                <button class="filter-btn" onclick="filterReports('month')">Ce mois</button>
+                <input type="date" class="search-box" onchange="filterByDate(this.value)" placeholder="Date spécifique">
+            </div>
+
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Heure Entrée</th>
+                        <th>Heure Sortie</th>
+                        <th>Heures Prestées</th>
+                        <th>Pause</th>
+                        <th>Total Jour</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #666;">Aucun rapport trouvé</td>
                     </tr>
                 </tbody>
             </table>
@@ -415,6 +556,7 @@
         let authManager = new AuthManager();
         let currentSection = 'dashboard';
         let timesheetHistory = [];
+        let currentFilter = 'all';
 
         // Initialisation de la page (SANS validation)
         window.addEventListener('load', async function() {
@@ -496,6 +638,8 @@
                 checkHTTPS();
             } else if (sectionName === 'history') {
                 loadHistory();
+            } else if (sectionName === 'reports') {
+                loadReports();
             } else if (sectionName === 'profile') {
                 loadUserData();
             }
@@ -578,10 +722,8 @@
             console.log('QR Code détecté:', decodedText);
             updateStatus('✅ QR Code détecté! Traitement en cours...', 'success');
             
-            // Simuler un traitement
-            setTimeout(() => {
-                updateStatus('✅ Pointage enregistré avec succès!', 'success');
-            }, 2000);
+            // Traiter le pointage
+            processPointage(decodedText);
         }
 
         // Échec de scan
@@ -593,30 +735,57 @@
             }
         }
 
+        // Traiter le pointage
+        function processPointage(qrData) {
+            try {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                const dateString = now.toLocaleDateString('fr-FR');
+
+                // Créer un nouveau pointage
+                const newEntry = {
+                    id: Date.now(),
+                    date: dateString,
+                    time: timeString,
+                    timestamp: now.toISOString(),
+                    type: 'entrée', // ou 'sortie' selon la logique
+                    code: generateUniqueCode(),
+                    status: '✅ Succès'
+                };
+
+                // Ajouter à l'historique
+                timesheetHistory.unshift(newEntry);
+                
+                // Sauvegarder dans localStorage
+                localStorage.setItem('timesheet_history', JSON.stringify(timesheetHistory));
+                
+                updateStatus('✅ Pointage enregistré avec succès!', 'success');
+                
+                // Recharger l'affichage
+                updateHistoryDisplay();
+                updateReports();
+                
+            } catch (error) {
+                console.error('Erreur traitement pointage:', error);
+                updateStatus('❌ Erreur lors du pointage', 'error');
+            }
+        }
+
         // Charger l'historique
         async function loadHistory() {
             try {
-                const user = authManager.getUser();
-                if (!user) {
-                    console.error('Aucun utilisateur connecté');
-                    return;
+                // Charger depuis localStorage
+                const savedHistory = localStorage.getItem('timesheet_history');
+                if (savedHistory) {
+                    timesheetHistory = JSON.parse(savedHistory);
+                } else {
+                    // Données de démonstration
+                    timesheetHistory = generateDemoData();
+                    localStorage.setItem('timesheet_history', JSON.stringify(timesheetHistory));
                 }
-
-                console.log('📊 Chargement des pointages...');
-                
-                // Simuler des données d'historique
-                timesheetHistory = [
-                    {
-                        start: new Date().toISOString(),
-                        code: 'QR_1234567890_ABC123',
-                        timesheetTypeId: 1
-                    },
-                    {
-                        start: new Date(Date.now() - 86400000).toISOString(),
-                        code: 'QR_1234567890_DEF456',
-                        timesheetTypeId: 2
-                    }
-                ];
                 
                 updateHistoryDisplay();
                 updateStatus('✅ Historique chargé', 'success');
@@ -627,27 +796,287 @@
             }
         }
 
+        // Générer des données de démonstration
+        function generateDemoData() {
+            const data = [];
+            const now = new Date();
+            
+            for (let i = 0; i < 10; i++) {
+                const date = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
+                const entryTime = new Date(date);
+                entryTime.setHours(8 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60));
+                
+                const exitTime = new Date(date);
+                exitTime.setHours(17 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 60));
+                
+                data.push({
+                    id: Date.now() + i,
+                    date: date.toLocaleDateString('fr-FR'),
+                    entryTime: entryTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                    exitTime: exitTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+                    hoursWorked: calculateHours(entryTime, exitTime),
+                    code: `QR_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+                    status: '✅ Succès'
+                });
+            }
+            
+            return data;
+        }
+
+        // Calculer les heures travaillées
+        function calculateHours(start, end) {
+            const diffMs = end - start;
+            const diffHours = diffMs / (1000 * 60 * 60);
+            return Math.round(diffHours * 10) / 10; // Arrondir à 1 décimale
+        }
+
         // Mettre à jour l'affichage de l'historique
         function updateHistoryDisplay() {
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
 
             if (timesheetHistory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">Aucun pointage trouvé</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Aucun pointage trouvé</td></tr>';
                 return;
             }
 
+            const filteredHistory = filterHistoryData(timesheetHistory, currentFilter);
+
+            filteredHistory.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.entryTime || entry.time || '-'}</td>
+                    <td>${entry.exitTime || '-'}</td>
+                    <td>${entry.hoursWorked ? entry.hoursWorked + 'h' : '-'}</td>
+                    <td>${entry.code}</td>
+                    <td>${entry.status}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Filtrer l'historique
+        function filterHistory(filter) {
+            currentFilter = filter;
+            
+            // Mettre à jour les boutons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            updateHistoryDisplay();
+        }
+
+        // Filtrer les données selon le critère
+        function filterHistoryData(data, filter) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekStart = new Date(today.getTime() - (today.getDay() * 24 * 60 * 60 * 1000));
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            switch (filter) {
+                case 'today':
+                    return data.filter(entry => {
+                        const entryDate = new Date(entry.timestamp || entry.date);
+                        return entryDate >= today;
+                    });
+                case 'week':
+                    return data.filter(entry => {
+                        const entryDate = new Date(entry.timestamp || entry.date);
+                        return entryDate >= weekStart;
+                    });
+                case 'month':
+                    return data.filter(entry => {
+                        const entryDate = new Date(entry.timestamp || entry.date);
+                        return entryDate >= monthStart;
+                    });
+                default:
+                    return data;
+            }
+        }
+
+        // Rechercher dans l'historique
+        function searchHistory(query) {
+            if (!query) {
+                updateHistoryDisplay();
+                return;
+            }
+
+            const filtered = timesheetHistory.filter(entry => 
+                entry.date.toLowerCase().includes(query.toLowerCase()) ||
+                entry.code.toLowerCase().includes(query.toLowerCase()) ||
+                (entry.entryTime && entry.entryTime.toLowerCase().includes(query.toLowerCase())) ||
+                (entry.exitTime && entry.exitTime.toLowerCase().includes(query.toLowerCase()))
+            );
+
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Aucun résultat trouvé</td></tr>';
+                return;
+            }
+
+            filtered.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.entryTime || entry.time || '-'}</td>
+                    <td>${entry.exitTime || '-'}</td>
+                    <td>${entry.hoursWorked ? entry.hoursWorked + 'h' : '-'}</td>
+                    <td>${entry.code}</td>
+                    <td>${entry.status}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Charger les rapports
+        function loadReports() {
+            updateReports();
+        }
+
+        // Mettre à jour les rapports
+        function updateReports() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekStart = new Date(today.getTime() - (today.getDay() * 24 * 60 * 60 * 1000));
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            // Calculer les heures
+            const hoursToday = calculateTotalHours(timesheetHistory.filter(entry => {
+                const entryDate = new Date(entry.timestamp || entry.date);
+                return entryDate >= today;
+            }));
+
+            const hoursWeek = calculateTotalHours(timesheetHistory.filter(entry => {
+                const entryDate = new Date(entry.timestamp || entry.date);
+                return entryDate >= weekStart;
+            }));
+
+            const hoursMonth = calculateTotalHours(timesheetHistory.filter(entry => {
+                const entryDate = new Date(entry.timestamp || entry.date);
+                return entryDate >= monthStart;
+            }));
+
+            // Mettre à jour les résumés
+            document.getElementById('hoursToday').textContent = hoursToday + 'h';
+            document.getElementById('hoursWeek').textContent = hoursWeek + 'h';
+            document.getElementById('hoursMonth').textContent = hoursMonth + 'h';
+            document.getElementById('totalEntries').textContent = timesheetHistory.length;
+
+            // Mettre à jour le tableau des rapports
+            updateReportsTable();
+        }
+
+        // Calculer le total des heures
+        function calculateTotalHours(entries) {
+            return entries.reduce((total, entry) => {
+                return total + (entry.hoursWorked || 0);
+            }, 0);
+        }
+
+        // Mettre à jour le tableau des rapports
+        function updateReportsTable() {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+
+            if (timesheetHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Aucun rapport trouvé</td></tr>';
+                return;
+            }
+
+            // Grouper par date
+            const groupedByDate = {};
             timesheetHistory.forEach(entry => {
-                const date = new Date(entry.start).toLocaleString('fr-FR');
-                const type = entry.timesheetTypeId === 1 ? '🟢 Entrée' : '🔴 Sortie';
-                const status = '✅ Succès';
+                const date = entry.date;
+                if (!groupedByDate[date]) {
+                    groupedByDate[date] = [];
+                }
+                groupedByDate[date].push(entry);
+            });
+
+            // Afficher les rapports groupés
+            Object.keys(groupedByDate).sort().reverse().forEach(date => {
+                const entries = groupedByDate[date];
+                const totalHours = calculateTotalHours(entries);
+                const pauseHours = 1.5; // Pause déjeuner par défaut
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${date}</td>
-                    <td>${entry.code}</td>
-                    <td>${type}</td>
-                    <td>${status}</td>
+                    <td>${entries[0]?.entryTime || entries[0]?.time || '-'}</td>
+                    <td>${entries[entries.length - 1]?.exitTime || '-'}</td>
+                    <td>${totalHours}h</td>
+                    <td>${pauseHours}h</td>
+                    <td>${(totalHours - pauseHours).toFixed(1)}h</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Filtrer les rapports
+        function filterReports(filter) {
+            // Mettre à jour les boutons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Appliquer le filtre
+            const filteredData = filterHistoryData(timesheetHistory, filter);
+            updateReportsTableWithData(filteredData);
+        }
+
+        // Filtrer par date
+        function filterByDate(date) {
+            if (!date) {
+                updateReportsTable();
+                return;
+            }
+
+            const filtered = timesheetHistory.filter(entry => entry.date === date);
+            updateReportsTableWithData(filtered);
+        }
+
+        // Mettre à jour le tableau avec des données filtrées
+        function updateReportsTableWithData(data) {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">Aucun rapport trouvé</td></tr>';
+                return;
+            }
+
+            // Grouper par date
+            const groupedByDate = {};
+            data.forEach(entry => {
+                const date = entry.date;
+                if (!groupedByDate[date]) {
+                    groupedByDate[date] = [];
+                }
+                groupedByDate[date].push(entry);
+            });
+
+            Object.keys(groupedByDate).sort().reverse().forEach(date => {
+                const entries = groupedByDate[date];
+                const totalHours = calculateTotalHours(entries);
+                const pauseHours = 1.5;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${entries[0]?.entryTime || entries[0]?.time || '-'}</td>
+                    <td>${entries[entries.length - 1]?.exitTime || '-'}</td>
+                    <td>${totalHours}h</td>
+                    <td>${pauseHours}h</td>
+                    <td>${(totalHours - pauseHours).toFixed(1)}h</td>
                 `;
                 
                 tbody.appendChild(row);
@@ -674,14 +1103,10 @@
                 return;
             }
 
-            let csv = 'Date,Code,Type,Statut\n';
+            let csv = 'Date,Heure Entrée,Heure Sortie,Heures Prestées,Code,Statut\n';
             
             timesheetHistory.forEach(entry => {
-                const date = new Date(entry.start).toLocaleString('fr-FR');
-                const type = entry.timesheetTypeId === 1 ? 'Entrée' : 'Sortie';
-                const status = 'Succès';
-                
-                csv += `"${date}","${entry.code}","${type}","${status}"\n`;
+                csv += `"${entry.date}","${entry.entryTime || entry.time || '-'}","${entry.exitTime || '-'}","${entry.hoursWorked ? entry.hoursWorked + 'h' : '-'}","${entry.code}","${entry.status}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -711,6 +1136,13 @@
                 statusDiv.textContent = message;
                 statusDiv.className = `status ${type}`;
             }
+        }
+
+        // Générer un code unique
+        function generateUniqueCode() {
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substring(2, 8);
+            return `QR_${timestamp}_${random}`.toUpperCase();
         }
     </script>
 </body>
