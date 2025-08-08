@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeSheet Web - Version Simple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: #1976D2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .user-details h2 {
+            color: #1976D2;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-tab.active {
+            background: #1976D2;
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e3f2fd;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .scanner-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .scanner-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .history-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .profile-section {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: #1976D2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .profile-info h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .profile-info p {
+            margin: 8px 0;
+            color: #666;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .scanner-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="user-info">
+                <div class="avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <h2 id="userDisplay">Utilisateur</h2>
+                    <p id="userRole">Employé</p>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('dashboard')">🏠 Tableau de bord</button>
+            <button class="nav-tab" onclick="showSection('scanner')">📷 Scanner QR</button>
+            <button class="nav-tab" onclick="showSection('history')">📊 Historique</button>
+            <button class="nav-tab" onclick="showSection('profile')">👤 Profil</button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section active">
+            <h2>📊 Tableau de Bord</h2>
+            <div class="dashboard-grid">
+                <div class="card" onclick="showSection('scanner')">
+                    <div class="card-icon">📷</div>
+                    <h3>Scanner QR</h3>
+                    <p>Scannez un QR code pour pointer</p>
+                </div>
+                <div class="card" onclick="showSection('history')">
+                    <div class="card-icon">📊</div>
+                    <h3>Historique</h3>
+                    <p>Consultez vos pointages</p>
+                </div>
+                <div class="card" onclick="showSection('profile')">
+                    <div class="card-icon">👤</div>
+                    <h3>Profil</h3>
+                    <p>Gérez votre compte</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scanner Section -->
+        <div id="scanner-section" class="section">
+            <h2>📷 Scanner QR Code</h2>
+            <div class="scanner-container">
+                <div class="scanner-controls">
+                    <button class="btn btn-success" id="startScanButton" onclick="startScanner()">▶️ Démarrer Scanner</button>
+                    <button class="btn btn-danger" id="stopScanButton" onclick="stopScanner()" style="display: none;">⏹️ Arrêter Scanner</button>
+                </div>
+                <div id="reader"></div>
+                <div id="scanStatus" class="status info">Prêt à scanner</div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div id="history-section" class="section">
+            <h2>📊 Historique des Pointages</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="btn btn-success" onclick="refreshData()">🔄 Actualiser</button>
+                <button class="btn btn-success" onclick="exportHistory()">📥 Exporter</button>
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Code</th>
+                        <th>Type</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #666;">Aucun pointage trouvé</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile-section" class="section">
+            <h2>👤 Profil Utilisateur</h2>
+            <div class="profile-section">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-info">
+                    <h3 id="profileName">Nom Utilisateur</h3>
+                    <p><strong>Email:</strong> <span id="profileEmail">email@example.com</span></p>
+                    <p><strong>Rôle:</strong> <span id="profileRole">Employé</span></p>
+                    <p><strong>Statut:</strong> <span id="profileStatus">Connecté</span></p>
+                </div>
+                <button class="btn btn-success" onclick="refreshProfile()">🔄 Actualiser Profil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- Auth Manager -->
+    <script src="auth.js"></script>
+    
+    <!-- App Logic -->
+    <script>
+        // Variables globales
+        let html5QrcodeScanner = null;
+        let isScanning = false;
+        let authManager = new AuthManager();
+        let currentSection = 'dashboard';
+        let timesheetHistory = [];
+
+        // Initialisation de la page
+        window.addEventListener('load', async function() {
+            console.log('🚀 Initialisation de la page...');
+            
+            // Vérifier l'authentification simple
+            if (!authManager.isAuthenticated()) {
+                console.log('❌ Utilisateur non authentifié');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            console.log('✅ Utilisateur authentifié');
+            
+            // Charger les données utilisateur
+            await loadUserData();
+            
+            // Charger l'historique
+            await loadHistory();
+            
+            updateStatus('✅ Application prête', 'success');
+        });
+
+        // Charger les données utilisateur
+        async function loadUserData() {
+            try {
+                const user = authManager.getUser();
+                if (user) {
+                    document.getElementById('userDisplay').textContent = user.displayName || user.username || 'Utilisateur';
+                    document.getElementById('userRole').textContent = user.role || 'Employé';
+                    
+                    // Avatar
+                    const avatar = document.getElementById('userAvatar');
+                    const profileAvatar = document.getElementById('profileAvatar');
+                    const initials = (user.displayName || user.username || 'U').substring(0, 1).toUpperCase();
+                    avatar.textContent = initials;
+                    profileAvatar.textContent = initials;
+                    
+                    // Profil
+                    document.getElementById('profileName').textContent = user.displayName || user.username || '-';
+                    document.getElementById('profileEmail').textContent = user.email || '-';
+                    document.getElementById('profileRole').textContent = user.role || 'Employé';
+                    document.getElementById('profileStatus').textContent = 'Connecté';
+                }
+            } catch (error) {
+                console.error('Erreur chargement données utilisateur:', error);
+            }
+        }
+
+        // Afficher une section
+        function showSection(sectionName) {
+            // Masquer toutes les sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Désactiver tous les onglets
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Afficher la section demandée
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Activer l'onglet correspondant
+            const targetTab = document.querySelector(`[onclick="showSection('${sectionName}')"]`);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            currentSection = sectionName;
+            
+            // Actions spécifiques selon la section
+            if (sectionName === 'scanner') {
+                checkHTTPS();
+            } else if (sectionName === 'history') {
+                loadHistory();
+            } else if (sectionName === 'profile') {
+                loadUserData();
+            }
+        }
+
+        // Vérifier HTTPS
+        function checkHTTPS() {
+            if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                updateStatus('❌ HTTPS requis pour accéder à la caméra. Utilisez https:// ou localhost.', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        // Démarrer le scanner
+        function startScanner() {
+            if (!checkHTTPS()) return;
+            
+            if (typeof Html5Qrcode === 'undefined') {
+                updateStatus('❌ Bibliothèque QR scanner non chargée', 'error');
+                return;
+            }
+
+            const startButton = document.getElementById('startScanButton');
+            const stopButton = document.getElementById('stopScanButton');
+            
+            if (startButton) startButton.style.display = 'none';
+            if (stopButton) stopButton.style.display = 'block';
+            
+            updateStatus('🔄 Initialisation du scanner...', 'info');
+            
+            const html5QrCode = new Html5Qrcode("reader");
+            
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+            
+            const cameraConfig = {
+                facingMode: "environment"
+            };
+            
+            html5QrCode.start(
+                cameraConfig,
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).then(() => {
+                updateStatus('📷 Scanner actif - Scannez un QR code', 'success');
+                isScanning = true;
+                window.html5QrCode = html5QrCode;
+            }).catch(err => {
+                updateStatus('❌ Erreur démarrage scanner: ' + err.message, 'error');
+                if (startButton) startButton.style.display = 'block';
+                if (stopButton) stopButton.style.display = 'none';
+                isScanning = false;
+            });
+        }
+
+        // Arrêter le scanner
+        function stopScanner() {
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().then(() => {
+                    updateStatus('⏹️ Scanner arrêté', 'info');
+                    isScanning = false;
+                    
+                    const startButton = document.getElementById('startScanButton');
+                    const stopButton = document.getElementById('stopScanButton');
+                    if (startButton) startButton.style.display = 'block';
+                    if (stopButton) stopButton.style.display = 'none';
+                }).catch(err => {
+                    console.error('Erreur arrêt scanner:', err);
+                });
+            }
+        }
+
+        // Succès de scan
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log('QR Code détecté:', decodedText);
+            updateStatus('✅ QR Code détecté! Traitement en cours...', 'success');
+            
+            // Simuler un traitement
+            setTimeout(() => {
+                updateStatus('✅ Pointage enregistré avec succès!', 'success');
+            }, 2000);
+        }
+
+        // Échec de scan
+        function onScanFailure(error) {
+            // Ignorer les erreurs normales de détection
+            const errorMessage = error.toString();
+            if (!errorMessage.includes('No MultiFormat Readers were able to detect the code')) {
+                console.log('Échec de scan:', errorMessage);
+            }
+        }
+
+        // Charger l'historique
+        async function loadHistory() {
+            try {
+                const user = authManager.getUser();
+                if (!user) {
+                    console.error('Aucun utilisateur connecté');
+                    return;
+                }
+
+                console.log('📊 Chargement des pointages...');
+                
+                // Simuler des données d'historique
+                timesheetHistory = [
+                    {
+                        start: new Date().toISOString(),
+                        code: 'QR_1234567890_ABC123',
+                        timesheetTypeId: 1
+                    },
+                    {
+                        start: new Date(Date.now() - 86400000).toISOString(),
+                        code: 'QR_1234567890_DEF456',
+                        timesheetTypeId: 2
+                    }
+                ];
+                
+                updateHistoryDisplay();
+                updateStatus('✅ Historique chargé', 'success');
+            } catch (error) {
+                console.error('❌ Erreur loadHistory:', error);
+                timesheetHistory = [];
+                updateHistoryDisplay();
+            }
+        }
+
+        // Mettre à jour l'affichage de l'historique
+        function updateHistoryDisplay() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            if (timesheetHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">Aucun pointage trouvé</td></tr>';
+                return;
+            }
+
+            timesheetHistory.forEach(entry => {
+                const date = new Date(entry.start).toLocaleString('fr-FR');
+                const type = entry.timesheetTypeId === 1 ? '🟢 Entrée' : '🔴 Sortie';
+                const status = '✅ Succès';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${entry.code}</td>
+                    <td>${type}</td>
+                    <td>${status}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualiser les données
+        async function refreshData() {
+            await loadUserData();
+            await loadHistory();
+            updateStatus('✅ Données actualisées', 'success');
+        }
+
+        // Actualiser le profil
+        async function refreshProfile() {
+            await loadUserData();
+            updateStatus('✅ Profil actualisé', 'success');
+        }
+
+        // Exporter l'historique
+        function exportHistory() {
+            if (timesheetHistory.length === 0) {
+                updateStatus('❌ Aucune donnée à exporter', 'error');
+                return;
+            }
+
+            let csv = 'Date,Code,Type,Statut\n';
+            
+            timesheetHistory.forEach(entry => {
+                const date = new Date(entry.start).toLocaleString('fr-FR');
+                const type = entry.timesheetTypeId === 1 ? 'Entrée' : 'Sortie';
+                const status = 'Succès';
+                
+                csv += `"${date}","${entry.code}","${type}","${status}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `historique_pointages_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            updateStatus('📥 Historique exporté', 'success');
+        }
+
+        // Déconnexion
+        function logout() {
+            authManager.logout();
+        }
+
+        // Mettre à jour le statut
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('scanStatus');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+                statusDiv.className = `status ${type}`;
+            }
+        }
+    </script>
+</body>
+</html>
