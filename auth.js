@@ -79,11 +79,11 @@ class AuthManager {
       
       // Vérification locale simple - on considère le token valide s'il existe
       // et qu'il n'est pas vide
-      if (token && token.length > 10) {
+      if (token && token.length > 0) {
         console.log('✅ Token valide (vérification locale)');
         return true;
       } else {
-        console.log('❌ Token invalide (trop court ou vide)');
+        console.log('❌ Token invalide (vide)');
         return false;
       }
     } catch (error) {
