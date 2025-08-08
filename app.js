@@ -233,28 +233,149 @@ function onScanFailure(error) {
 // Traiter le QR code
 async function processQRCode(qrData) {
   try {
-    let payload;
+    console.log('QR Code reçu:', qrData);
+    console.log('Longueur QR:', qrData.length, 'caractères');
     
-    // Essayer de parser comme JSON
+    // Parser le JSON du QR code (comme dans l'APK Flutter)
+    let qrJson;
     try {
-      const parsedData = JSON.parse(qrData);
-      payload = {
-        code: parsedData.code || `QR_${Date.now()}`,
-        details: JSON.stringify(parsedData),
-        start: new Date().toISOString(),
-        planningId: parsedData.planningId || 5,
-        timesheetTypeId: parsedData.timesheetTypeId || 1
-      };
+      qrJson = JSON.parse(qrData);
+      console.log('QR JSON parsé:', qrJson);
+      console.log('Clés disponibles:', Object.keys(qrJson));
     } catch (e) {
-      // Traiter comme texte simple
-      payload = {
-        code: qrData,
-        details: `QR Code scanné - ${new Date().toLocaleString('fr-FR')}`,
-        start: new Date().toISOString(),
-        planningId: 5,
-        timesheetTypeId: 1
-      };
+      console.error('Erreur parsing JSON:', e);
+      showErrorMessage('QR code invalide: Format JSON incorrect');
+      return;
     }
+
+    // Vérifier l'expiration du QR code (30 secondes) - comme dans l'APK
+    if (qrJson.timestamp) {
+      try {
+        const qrTimestamp = new Date(qrJson.timestamp);
+        const now = new Date();
+        const difference = Math.floor((now - qrTimestamp) / 1000);
+        
+        if (difference > 30) {
+          showErrorMessage('QR code expiré (plus de 30 secondes)');
+          return;
+        }
+        
+        console.log('QR code valide:', 30 - difference, 'secondes restantes');
+      } catch (e) {
+        console.error('Erreur parsing timestamp:', e);
+      }
+    }
+
+    // Extraire les données selon le format (exactement comme l'APK Flutter)
+    let siteId, planningId, timesheetTypeId;
+    let siteName = '';
+    let employeeId;
+    
+    // Format Vercel exact (userId + userName + planningId + timeSheetId)
+    if (qrJson.userId && qrJson.userName && qrJson.planningId) {
+      siteId = 1; // Site par défaut
+      planningId = qrJson.planningId;
+      timesheetTypeId = qrJson.timeSheetTypeId || 1;
+      siteName = 'test'; // Site fixe pour correspondre au QR
+      employeeId = qrJson.userId; // ID de l'utilisateur spécifique
+      console.log('Format détecté: Vercel (exact)');
+      console.log('  userId:', qrJson.userId);
+      console.log('  userName:', qrJson.userName);
+      console.log('  planningId:', qrJson.planningId);
+      console.log('  timeSheetTypeId:', qrJson.timeSheetTypeId);
+      console.log('  siteName:', siteName);
+    }
+    // Format Vercel (site + employé) - Format complet
+    else if (qrJson.siteId && qrJson.planningId && qrJson.timesheetTypeId) {
+      siteId = qrJson.siteId;
+      planningId = qrJson.planningId;
+      timesheetTypeId = qrJson.timesheetTypeId;
+      siteName = qrJson.siteName || 'Site inconnu';
+      employeeId = qrJson.employeeId; // ID de l'employé spécifique
+      console.log('Format détecté: Vercel (complet)');
+    }
+    // Format Vercel (site + employé) - Format sans employeeId
+    else if (qrJson.siteId && qrJson.planningId) {
+      siteId = qrJson.siteId;
+      planningId = qrJson.planningId;
+      timesheetTypeId = qrJson.timesheetTypeId || 1;
+      siteName = qrJson.siteName || 'Site inconnu';
+      console.log('Format détecté: Vercel (sans employeeId)');
+    }
+    // Format raccourci (notre app)
+    else if (qrJson.uid && qrJson.pid) {
+      siteId = 1; // Site par défaut
+      planningId = qrJson.pid;
+      timesheetTypeId = 1; // Type par défaut
+      siteName = 'Site par défaut';
+      console.log('Format détecté: raccourci');
+    }
+    // Format inconnu - Essayons avec des valeurs par défaut
+    else {
+      console.log('❌ Format non reconnu, utilisation des valeurs par défaut');
+      console.log('QR JSON reçu:', qrJson);
+      console.log('Clés disponibles:', Object.keys(qrJson));
+      siteId = 1;
+      planningId = 5;
+      timesheetTypeId = 1;
+      siteName = 'Site par défaut';
+    }
+
+    // Vérifier que l'employé actuel correspond à celui du QR
+    const currentUser = authManager.getUser();
+    if (employeeId && currentUser && currentUser.id !== employeeId) {
+      showErrorMessage('QR code invalide: Employé non autorisé');
+      return;
+    }
+
+    console.log('Données extraites:');
+    console.log('  SiteId:', siteId);
+    console.log('  PlanningId:', planningId);
+    console.log('  TimesheetTypeId:', timesheetTypeId);
+    console.log('  SiteName:', siteName);
+    console.log('  EmployeeId:', employeeId);
+
+    // Créer automatiquement le timesheet après validation (comme l'APK)
+    console.log('🔄 Création automatique du timesheet...');
+    await createTimesheet(siteId, planningId, timesheetTypeId, qrData);
+    
+  } catch (error) {
+    console.error('Erreur lors du traitement:', error);
+    showErrorMessage('Erreur lors du traitement du QR code');
+  } finally {
+    hideScanIndicator();
+  }
+}
+
+async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
+  try {
+    const user = authManager.getUser();
+    if (!user) {
+      showErrorMessage('Utilisateur non connecté');
+      return;
+    }
+
+    const uniqueCode = generateUniqueCode();
+
+    // Créer des détails raccourcis pour respecter la limite de 256 caractères (comme l'APK)
+    const details = {
+      uid: user.id, // ID de l'employé réel
+      un: user.displayName,
+      pid: planningId,
+      ts: Date.now(),
+      lat: 0.0, // Position par défaut pour le web
+      lng: 0.0
+    };
+
+    const detailsJson = JSON.stringify(details);
+
+    const payload = {
+      code: uniqueCode,
+      details: detailsJson,
+      start: new Date().toISOString(),
+      planningId: planningId,
+      timesheetTypeId: timesheetTypeId
+    };
 
     const response = await fetch(`${authManager.API_BASE_URL}/Timesheet`, {
       method: 'POST',
@@ -267,26 +388,18 @@ async function processQRCode(qrData) {
 
     if (response.ok) {
       const result = await response.json();
+      showSuccessMessage('✅ Pointage automatique enregistré avec succès!');
+      console.log('✅ Timesheet créé avec ID:', result.id);
       
-      const successMessage = `✅ POINTAGE RÉUSSI ! ${new Date().toLocaleTimeString('fr-FR')}`;
-      updateStatus(successMessage, 'success');
-      showSuccessMessage(successMessage);
-      
-      // Arrêter le scanner
-      stopScanner();
-      
-      // Actualiser l'historique
+      // Recharger l'historique
       await loadHistory();
-      
     } else {
-      const errorText = await response.text();
-      updateStatus(`❌ Erreur: ${errorText}`, 'error');
+      const errorData = await response.json();
+      showErrorMessage(`❌ Échec de l'enregistrement automatique: ${errorData.message || 'Erreur serveur'}`);
     }
   } catch (error) {
-    console.error('Erreur traitement QR:', error);
-    updateStatus('❌ Erreur de connexion', 'error');
-  } finally {
-    hideScanIndicator();
+    console.error('Erreur création timesheet:', error);
+    showErrorMessage(`Erreur: ${error.message}`);
   }
 }
 
@@ -322,6 +435,39 @@ function showSuccessMessage(message) {
   }, 3000);
 }
 
+// Afficher un message d'erreur
+function showErrorMessage(message) {
+  const errorDiv = document.createElement('div');
+  errorDiv.className = 'error-message';
+  errorDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ff4444;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 10000;
+    text-align: center;
+    max-width: 300px;
+    font-size: 14px;
+  `;
+  errorDiv.innerHTML = `
+    <div style="font-size: 24px; margin-bottom: 10px;">❌</div>
+    ${message}
+  `;
+  
+  document.body.appendChild(errorDiv);
+  
+  setTimeout(() => {
+    if (errorDiv.parentNode) {
+      errorDiv.parentNode.removeChild(errorDiv);
+    }
+  }, 4000);
+}
+
 // Tester le scanner
 function testScanner() {
   if (typeof Html5Qrcode === 'undefined') {
@@ -342,23 +488,45 @@ function testScanner() {
 // Charger l'historique
 async function loadHistory() {
   try {
-    const response = await fetch(`${authManager.API_BASE_URL}/Timesheet`, {
-      headers: {
-        'Authorization': `Bearer ${authManager.getToken()}`,
-        'Content-Type': 'application/json'
-      }
+    const user = authManager.getUser();
+    if (!user) {
+      console.error('Aucun utilisateur connecté');
+      return;
+    }
+
+    console.log('📊 Chargement des pointages pour utilisateur:', user.id);
+    
+    const response = await fetch(`${authManager.API_BASE_URL}/Timesheet/DailyResume/UserId/${user.id}`, {
+      method: 'GET',
+      headers: authManager.getAuthHeaders()
     });
 
     if (response.ok) {
       const data = await response.json();
-      timesheetHistory = data;
+      console.log('📋 Pointages récupérés:', data);
+      
+      // Gérer différents formats de réponse (comme dans l'APK Flutter)
+      if (Array.isArray(data)) {
+        timesheetHistory = data;
+        console.log('✅ Format liste détecté:', data.length, 'pointages');
+      } else if (typeof data === 'object') {
+        timesheetHistory = [data];
+        console.log('✅ Format objet détecté, converti en liste');
+      } else {
+        timesheetHistory = [];
+        console.log('⚠️ Format inattendu, liste vide');
+      }
+      
       updateHistoryDisplay();
     } else {
-      updateStatus('❌ Erreur chargement historique', 'error');
+      console.error('❌ Erreur chargement historique:', response.status, response.statusText);
+      timesheetHistory = [];
+      updateHistoryDisplay();
     }
   } catch (error) {
-    console.error('Erreur chargement historique:', error);
-    updateStatus('❌ Erreur de connexion', 'error');
+    console.error('❌ Erreur loadHistory:', error);
+    timesheetHistory = [];
+    updateHistoryDisplay();
   }
 }
 

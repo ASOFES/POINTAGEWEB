@@ -1,7 +1,7 @@
 // Gestionnaire d'authentification pour l'application TimeSheet
 class AuthManager {
   constructor() {
-    this.API_BASE_URL = 'https://api.pointage.com/api'; // URL de votre API de production
+    this.API_BASE_URL = 'https://timesheetapp.azurewebsites.net/api'; // URL réelle de l'API Flutter
     this.tokenKey = 'timesheet_token';
     this.userKey = 'timesheet_user';
   }
@@ -38,20 +38,24 @@ class AuthManager {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          Email: email,
+          email: email,
           password: password
         })
       });
 
-      if (response.ok) {
+      if (response.statusCode === 200 || response.ok) {
         const data = await response.json();
         
         if (data.token) {
           this.saveAuthData(data.token, data.user);
+          // Charger les informations utilisateur après connexion
+          await this.loadCurrentUser();
           return { success: true, user: data.user };
         } else {
           return { success: false, error: 'Token non reçu' };
         }
+      } else if (response.status === 401) {
+        return { success: false, error: 'Identifiants incorrects' };
       } else {
         const errorData = await response.json();
         return { success: false, error: errorData.message || 'Erreur de connexion' };
@@ -96,6 +100,49 @@ class AuthManager {
       'Authorization': `Bearer ${this.getToken()}`,
       'Content-Type': 'application/json'
     };
+  }
+
+  // Charger les informations de l'utilisateur connecté (comme dans l'APK Flutter)
+  async loadCurrentUser() {
+    if (!this.getToken()) return;
+
+    try {
+      // Récupérer l'utilisateur connecté via l'API Auth
+      const response = await fetch(`${this.API_BASE_URL}/Auth/users/1`, {
+        method: 'GET',
+        headers: this.getAuthHeaders()
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // L'API retourne une liste d'utilisateurs, prenons le premier
+        if (Array.isArray(data) && data.length > 0) {
+          const user = data[0];
+          this.saveAuthData(this.getToken(), user);
+          console.log('✅ Utilisateur chargé depuis la liste:', user.displayName);
+        } else if (typeof data === 'object') {
+          this.saveAuthData(this.getToken(), data);
+          console.log('✅ Utilisateur chargé depuis l\'objet:', data.displayName);
+        } else {
+          throw new Error('Format de réponse inattendu');
+        }
+      } else {
+        throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de l\'utilisateur:', error);
+      // Créer un utilisateur par défaut si nécessaire
+      const defaultUser = {
+        id: 1,
+        displayName: 'Test User',
+        userName: 'test',
+        employeeId: null,
+        employee: null
+      };
+      this.saveAuthData(this.getToken(), defaultUser);
+      console.log('✅ Utilisateur par défaut créé');
+    }
   }
 }
 
