@@ -610,3 +610,10 @@ function updateStatus(message, type = 'info') {
     statusDiv.className = `status ${type}`;
   }
 }
+
+// Générer un code unique (comme dans l'APK Flutter)
+function generateUniqueCode() {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `QR_${timestamp}_${random}`.toUpperCase();
+}

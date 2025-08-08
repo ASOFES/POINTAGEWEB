@@ -43,7 +43,7 @@ class AuthManager {
         })
       });
 
-      if (response.statusCode === 200 || response.ok) {
+      if (response.ok) {
         const data = await response.json();
         
         if (data.token) {
