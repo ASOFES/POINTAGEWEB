@@ -39,7 +39,7 @@ async function checkAuthentication() {
     return false;
   }
 
-  console.log('✅ Token présent, validation...');
+  console.log('✅ Token présent, validation locale...');
   
   try {
     const isValid = await authManager.validateToken();
@@ -53,7 +53,7 @@ async function checkAuthentication() {
     return true;
   } catch (error) {
     console.error('❌ Erreur authentification:', error);
-    // En cas d'erreur, on ne déconnecte pas automatiquement
+    // En cas d'erreur, on continue quand même
     console.log('⚠️ Erreur de validation, mais on continue');
     return true;
   }

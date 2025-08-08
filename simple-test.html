@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Simple Connexion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #1976D2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1565C0;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Simple Connexion</h1>
+    
+    <div class="test-section">
+        <h3>🔐 Test Connexion Simple</h3>
+        <button onclick="testSimpleLogin()">Tester Connexion</button>
+        <button onclick="checkStorage()">Vérifier Storage</button>
+        <button onclick="goToApp()">Aller à l'App</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://timesheetapp.azurewebsites.net/api';
+
+        function log(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            resultDiv.innerHTML += `<div class="${type}">[${timestamp}] ${message}</div>`;
+            resultDiv.scrollTop = resultDiv.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        async function testSimpleLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            
+            log('🚀 Test de connexion simple...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'Test@test.com',
+                        password: 'test123'
+                    })
+                });
+
+                const data = await response.json();
+                log(`📊 Réponse: ${response.status} ${response.statusText}`, 'info');
+                log(`📋 Données: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+                if (response.ok && data.token) {
+                    // Sauvegarder en localStorage
+                    localStorage.setItem('timesheet_token', data.token);
+                    localStorage.setItem('timesheet_user', JSON.stringify(data.user || {}));
+                    
+                    log('✅ Connexion réussie et sauvegardée!', 'success');
+                    log('💾 Token et utilisateur sauvegardés en localStorage', 'success');
+                    
+                    // Vérifier la sauvegarde
+                    const savedToken = localStorage.getItem('timesheet_token');
+                    const savedUser = localStorage.getItem('timesheet_user');
+                    
+                    log(`🔑 Token sauvegardé: ${savedToken ? 'Oui' : 'Non'}`, savedToken ? 'success' : 'error');
+                    log(`👤 User sauvegardé: ${savedUser ? 'Oui' : 'Non'}`, savedUser ? 'success' : 'error');
+                    
+                } else {
+                    log(`❌ Erreur de connexion: ${response.status}`, 'error');
+                    log(`📋 Erreur: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Erreur réseau: ${error.message}`, 'error');
+            }
+        }
+
+        function checkStorage() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            
+            log('🔍 Vérification localStorage...', 'info');
+            
+            const token = localStorage.getItem('timesheet_token');
+            const user = localStorage.getItem('timesheet_user');
+            
+            log(`🔑 Token: ${token ? 'Présent' : 'Absent'}`, token ? 'success' : 'error');
+            log(`👤 User: ${user ? 'Présent' : 'Absent'}`, user ? 'success' : 'error');
+            
+            if (token) {
+                log(`🔑 Token: ${token.substring(0, 20)}...`, 'info');
+            }
+            
+            if (user) {
+                try {
+                    const userObj = JSON.parse(user);
+                    log(`👤 User: ${JSON.stringify(userObj, null, 2)}`, 'info');
+                } catch (e) {
+                    log(`❌ Erreur parsing user: ${e.message}`, 'error');
+                }
+            }
+        }
+
+        function goToApp() {
+            const token = localStorage.getItem('timesheet_token');
+            if (token) {
+                log('🚀 Redirection vers l\'application...', 'info');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                log('❌ Pas de token, connexion requise', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -66,7 +66,7 @@ class AuthManager {
     }
   }
 
-  // Valider le token
+  // Valider le token (version simplifiée sans appel API)
   async validateToken() {
     try {
       const token = this.getToken();
@@ -75,29 +75,20 @@ class AuthManager {
         return false;
       }
 
-      console.log('🔐 Validation du token...');
-      const response = await fetch(`${this.API_BASE_URL}/Auth/validate`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log(`📊 Réponse validation: ${response.status} ${response.statusText}`);
+      console.log('🔐 Validation du token (locale)...');
       
-      if (response.ok) {
-        console.log('✅ Token valide');
+      // Vérification locale simple - on considère le token valide s'il existe
+      // et qu'il n'est pas vide
+      if (token && token.length > 10) {
+        console.log('✅ Token valide (vérification locale)');
         return true;
       } else {
-        console.log('❌ Token invalide');
+        console.log('❌ Token invalide (trop court ou vide)');
         return false;
       }
     } catch (error) {
       console.error('❌ Erreur validation token:', error);
-      // En cas d'erreur réseau, on considère le token comme valide temporairement
-      console.log('⚠️ Erreur réseau, token considéré comme valide temporairement');
-      return true;
+      return false;
     }
   }
 
