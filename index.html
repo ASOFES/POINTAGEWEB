@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:">
+  <title>TimeSheet Employee App - Web Mobile</title>
+  
+  <!-- Chargement de la bibliothèque QR scanner -->
+  <script>
+    function loadQRScannerLibrary(cdnUrl, onSuccess, onError) {
+      const script = document.createElement('script');
+      script.src = cdnUrl;
+      script.crossOrigin = 'anonymous';
+      
+      script.onload = function() {
+        console.log('✅ Bibliothèque chargée depuis:', cdnUrl);
+        onSuccess();
+      };
+      
+      script.onerror = function() {
+        console.log('❌ Échec de chargement depuis:', cdnUrl);
+        onError();
+      };
+      
+      document.head.appendChild(script);
+    }
+
+    const cdnUrls = [
+      'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js',
+      'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js'
+    ];
+
+    let currentCdnIndex = 0;
+
+    function tryNextCDN() {
+      if (currentCdnIndex < cdnUrls.length) {
+        const cdnUrl = cdnUrls[currentCdnIndex];
+        console.log(`🔄 Tentative de chargement depuis: ${cdnUrl}`);
+        
+        loadQRScannerLibrary(
+          cdnUrl,
+          function() {
+            if (typeof Html5QrcodeScanner !== 'undefined') {
+              console.log('✅ Bibliothèque QR scanner chargée avec succès');
+              window.dispatchEvent(new Event('qrLibraryLoaded'));
+            } else {
+              console.log('⚠️ Script chargé mais Html5QrcodeScanner non défini');
+              tryNextCDN();
+            }
+          },
+          function() {
+            currentCdnIndex++;
+            tryNextCDN();
+          }
+        );
+        
+        currentCdnIndex++;
+      } else {
+        console.error('❌ Tous les CDN ont échoué');
+        window.dispatchEvent(new Event('qrLibraryLoadFailed'));
+      }
+    }
+
+    tryNextCDN();
+  </script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .header {
+      background: #1976D2;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logout-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .user-header {
+      padding: 20px;
+      background: white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #1976D2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .user-details h3 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .user-details p {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .main-actions {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .action-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .action-card:hover {
+      border-color: #1976D2;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(25, 118, 210, 0.2);
+    }
+
+    .action-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .action-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .action-subtitle {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .scanner-section {
+      padding: 30px;
+      text-align: center;
+      display: none;
+    }
+
+    .scanner-section.active {
+      display: block;
+    }
+
+    .scanner-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1976D2;
+      margin-bottom: 20px;
+    }
+
+    #reader {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .scanner-controls {
+      margin: 20px 0;
+    }
+
+    .btn {
+      background: #1976D2;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(25, 118, 210, 0.3);
+    }
+
+    .btn:hover {
+      background: #1565C0;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-success {
+      background: #4CAF50;
+    }
+
+    .btn-success:hover {
+      background: #45a049;
+    }
+
+    .btn-warning {
+      background: #FF9800;
+    }
+
+    .btn-warning:hover {
+      background: #F57C00;
+    }
+
+    .history-section {
+      padding: 20px;
+      display: none;
+    }
+
+    .history-section.active {
+      display: block;
+    }
+
+    .history-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1976D2;
+      margin-bottom: 15px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .history-table th {
+      background: #1976D2;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .history-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .history-table tr:hover {
+      background: #f8f9fa;
+    }
+
+    .profile-section {
+      padding: 20px;
+      display: none;
+    }
+
+    .profile-section.active {
+      display: block;
+    }
+
+    .profile-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1976D2;
+      margin-bottom: 15px;
+    }
+
+    .profile-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .profile-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .profile-item:last-child {
+      border-bottom: none;
+    }
+
+    .profile-label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .profile-value {
+      color: #333;
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .nav-tab.active {
+      border-bottom-color: #1976D2;
+      background: white;
+      color: #1976D2;
+      font-weight: bold;
+    }
+
+    .nav-tab:hover {
+      background: #e3f2fd;
+    }
+
+    .status {
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 10px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .status.info {
+      background: #E3F2FD;
+      color: #1976D2;
+      border: 1px solid #BBDEFB;
+    }
+
+    .status.success {
+      background: #E8F5E8;
+      color: #2E7D32;
+      border: 1px solid #C8E6C9;
+    }
+
+    .status.error {
+      background: #FFEBEE;
+      color: #C62828;
+      border: 1px solid #FFCDD2;
+    }
+
+    .status.warning {
+      background: #FFF3E0;
+      color: #E65100;
+      border: 1px solid #FFCC02;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      color: #1976D2;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #1976D2;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .success-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #4CAF50;
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 10000;
+      animation: successPulse 2s ease-in-out;
+    }
+
+    @keyframes successPulse {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .scan-indicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .scan-indicator.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+        max-width: calc(100vw - 20px);
+      }
+      
+      .main-actions {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      .action-card {
+        padding: 15px;
+      }
+      
+      .btn {
+        padding: 10px 20px;
+        font-size: 14px;
+        margin: 5px;
+      }
+
+      .history-table {
+        font-size: 12px;
+      }
+
+      .history-table th,
+      .history-table td {
+        padding: 8px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>TimeSheet App</h1>
+      <div class="user-info">
+        <span id="userDisplay">Chargement...</span>
+        <button class="logout-btn" onclick="logout()">🚪 Déconnexion</button>
+      </div>
+    </div>
+
+    <!-- Indicateur de scan en cours -->
+    <div id="scanIndicator" class="scan-indicator">
+      <div style="text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 10px;">⏳</div>
+        <div id="scanMessage">Traitement en cours...</div>
+      </div>
+    </div>
+
+    <!-- Section utilisateur -->
+    <div class="user-header">
+      <div class="user-card">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-details">
+          <h3 id="userName">Utilisateur</h3>
+          <p id="userRole">Employé</p>
+          <p id="userEmail">email@example.com</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="showSection('dashboard')">🏠 Tableau de bord</div>
+      <div class="nav-tab" onclick="showSection('scanner')">📷 Scanner QR</div>
+      <div class="nav-tab" onclick="showSection('history')">📊 Historique</div>
+      <div class="nav-tab" onclick="showSection('profile')">👤 Profil</div>
+    </div>
+
+    <!-- Section Tableau de bord -->
+    <div id="dashboard-section" class="dashboard-section active">
+      <div class="main-actions">
+        <div class="action-card" onclick="showSection('scanner')">
+          <div class="action-icon">📷</div>
+          <div class="action-title">Scanner QR</div>
+          <div class="action-subtitle">Pointer votre entrée/sortie</div>
+        </div>
+        
+        <div class="action-card" onclick="showSection('history')">
+          <div class="action-icon">📊</div>
+          <div class="action-title">Historique</div>
+          <div class="action-subtitle">Voir vos pointages</div>
+        </div>
+        
+        <div class="action-card" onclick="showSection('profile')">
+          <div class="action-icon">👤</div>
+          <div class="action-title">Profil</div>
+          <div class="action-subtitle">Informations personnelles</div>
+        </div>
+        
+        <div class="action-card" onclick="refreshData()">
+          <div class="action-icon">🔄</div>
+          <div class="action-title">Actualiser</div>
+          <div class="action-subtitle">Synchroniser les données</div>
+        </div>
+      </div>
+
+      <!-- Pointages récents -->
+      <div style="padding: 20px;">
+        <h3 style="color: #1976D2; margin-bottom: 15px;">📅 Pointages Récents</h3>
+        <div id="recentTimesheets">
+          <div class="loading">
+            <div class="spinner"></div>
+            <span>Chargement des pointages récents...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Scanner QR -->
+    <div id="scanner-section" class="scanner-section">
+      <h3 class="scanner-title">📷 Scanner QR Code</h3>
+      <div id="reader"></div>
+      <div id="scanStatus" class="status info">
+        Scanner prêt - Placez le QR code dans le cadre
+      </div>
+      <div class="scanner-controls">
+        <button id="startScanButton" onclick="startScanner()" class="btn btn-success">
+          🚀 Démarrer le Scanner
+        </button>
+        <button id="stopScanButton" onclick="stopScanner()" class="btn btn-warning" style="display: none;">
+          ⏹️ Arrêter le Scanner
+        </button>
+        <button onclick="testScanner()" class="btn">
+          🧪 Tester le Scanner
+        </button>
+      </div>
+    </div>
+
+    <!-- Section Historique -->
+    <div id="history-section" class="history-section">
+      <h3 class="history-title">📊 Historique des Pointages</h3>
+      <div style="margin-bottom: 15px;">
+        <button onclick="loadHistory()" class="btn">🔄 Actualiser</button>
+        <button onclick="exportHistory()" class="btn btn-success">📤 Exporter</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>📅 Date/Heure</th>
+              <th>🏷️ Code</th>
+              <th>⏰ Type</th>
+              <th>✅ Statut</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Rempli dynamiquement -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section Profil -->
+    <div id="profile-section" class="profile-section">
+      <h3 class="profile-title">👤 Profil Utilisateur</h3>
+      <div class="profile-info">
+        <div class="profile-item">
+          <span class="profile-label">Nom complet:</span>
+          <span class="profile-value" id="profileName">-</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">Email:</span>
+          <span class="profile-value" id="profileEmail">-</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">Rôle:</span>
+          <span class="profile-value" id="profileRole">-</span>
+        </div>
+        <div class="profile-item">
+          <span class="profile-label">Statut:</span>
+          <span class="profile-value" id="profileStatus">-</span>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <button onclick="refreshProfile()" class="btn">🔄 Actualiser Profil</button>
+        <button onclick="logout()" class="btn btn-warning">🚪 Déconnexion</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

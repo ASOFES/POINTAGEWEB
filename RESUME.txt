@@ -1,0 +1,3234 @@
+
+
+
+ - Local:    http://localhost:9005        │
+   │   - Network:  http://192.168.11.101:9005   │
+   │                                       
+
+	URL DE BASE POUR LE PROJET 
+	
+	Backend Intégré :
+URL : https://timesheetapp.azurewebsites.net/api
+Authentification : JWT Token
+Identifiants : Test@test.com / test123
+📱 Applications Créées
+
+✅ Géolocalisation pour vérifier la présence
+✅ Pointage automatique (entrée/sortie)
+✅ Interface utilisateur intuitive
+✅ Gestion des erreurs et notifications
+Structure des fichiers :
+
+	src/
+├── components/
+│   ├── QRScanner.tsx
+│   ├── LoginForm.tsx
+│   └── HomeScreen.tsx
+├── services/
+│   └── api.ts
+├── types/
+│   └── api.ts
+└── screens/
+    ├── LoginScreen.tsx
+    └── HomeScreen.tsx
+    
+    2. Application Admin (Génération QR)
+Fonctionnalités :
+✅ Connexion administrateur
+✅ Génération de QR codes personnalisés
+✅ Sélection de site et type de pointage
+✅ Sauvegarde et partage des QR codes
+✅ Dashboard avec statistiques
+✅ Gestion des employés et sites
+Structure des fichiers :
+
+    qr-generator-app/
+├── src/
+│   ├── components/
+│   │   └── QRCodeGenerator.tsx
+│   ├── services/
+│   │   └── api.ts
+│   ├── types/
+│   │   └── api.ts
+│   └── screens/
+│       ├── LoginScreen.tsx
+│       └── HomeScreen.tsx
+└── App.tsx
+    L'idée est d'avoir une application qui va communiquer  avec un backend  qui est déjà en distribution en ligne
+    les différents urls pour le backend sont sur les ligne qui suivent
+    
+    
+	
+	
+openapi	"3.0.1"
+info	
+title	"TimeSheetAppBE"
+version	"1.0"
+paths	
+/api/Auth/login	
+post	
+tags	
+0	"Auth"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Login"
+text/json	
+schema	
+$ref	"#/components/schemas/Login"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Login"
+responses	
+200	
+description	"OK"
+/api/Auth/users/{userId}	
+get	
+tags	
+0	"Auth"
+parameters	
+0	
+name	"userId"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+/api/Bank	
+get	
+tags	
+0	"Bank"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Bank"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Bank"
+text/json	
+schema	
+$ref	"#/components/schemas/Bank"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Bank"
+responses	
+200	
+description	"OK"
+/api/Bank/{id}	
+get	
+tags	
+0	"Bank"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Bank"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Bank"
+text/json	
+schema	
+$ref	"#/components/schemas/Bank"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Bank"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Bank"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/City	
+get	
+tags	
+0	"City"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"City"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/City"
+text/json	
+schema	
+$ref	"#/components/schemas/City"
+application/*+json	
+schema	
+$ref	"#/components/schemas/City"
+responses	
+200	
+description	"OK"
+/api/City/{id}	
+get	
+tags	
+0	"City"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"City"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/City"
+text/json	
+schema	
+$ref	"#/components/schemas/City"
+application/*+json	
+schema	
+$ref	"#/components/schemas/City"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"City"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/ContractType	
+get	
+tags	
+0	"ContractType"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"ContractType"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/ContractType"
+text/json	
+schema	
+$ref	"#/components/schemas/ContractType"
+application/*+json	
+schema	
+$ref	"#/components/schemas/ContractType"
+responses	
+200	
+description	"OK"
+/api/ContractType/{id}	
+get	
+tags	
+0	"ContractType"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"ContractType"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/ContractType"
+text/json	
+schema	
+$ref	"#/components/schemas/ContractType"
+application/*+json	
+schema	
+$ref	"#/components/schemas/ContractType"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"ContractType"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Country	
+get	
+tags	
+0	"Country"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Country"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Country"
+text/json	
+schema	
+$ref	"#/components/schemas/Country"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Country"
+responses	
+200	
+description	"OK"
+/api/Country/{id}	
+get	
+tags	
+0	"Country"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Country"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Country"
+text/json	
+schema	
+$ref	"#/components/schemas/Country"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Country"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Country"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Dashboard/stats	
+get	
+tags	
+0	"Dashboard"
+responses	
+200	
+description	"OK"
+/api/Dashboard/chart	
+get	
+tags	
+0	"Dashboard"
+responses	
+200	
+description	"OK"
+/api/Employee	
+get	
+tags	
+0	"Employee"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Employee"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/EmployeeDto"
+text/json	
+schema	
+$ref	"#/components/schemas/EmployeeDto"
+application/*+json	
+schema	
+$ref	"#/components/schemas/EmployeeDto"
+responses	
+200	
+description	"OK"
+/api/Employee/{id}	
+get	
+tags	
+0	"Employee"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Employee"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/EmployeeDto"
+text/json	
+schema	
+$ref	"#/components/schemas/EmployeeDto"
+application/*+json	
+schema	
+$ref	"#/components/schemas/EmployeeDto"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Employee"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+/api/Function	
+get	
+tags	
+0	"Function"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Function"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Function"
+text/json	
+schema	
+$ref	"#/components/schemas/Function"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Function"
+responses	
+200	
+description	"OK"
+/api/Function/{id}	
+get	
+tags	
+0	"Function"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Function"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Function"
+text/json	
+schema	
+$ref	"#/components/schemas/Function"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Function"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Function"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Grade	
+get	
+tags	
+0	"Grade"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Grade"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Grade"
+text/json	
+schema	
+$ref	"#/components/schemas/Grade"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Grade"
+responses	
+200	
+description	"OK"
+/api/Grade/{id}	
+get	
+tags	
+0	"Grade"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Grade"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Grade"
+text/json	
+schema	
+$ref	"#/components/schemas/Grade"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Grade"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Grade"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Planning	
+get	
+tags	
+0	"Planning"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Planning"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Planning"
+text/json	
+schema	
+$ref	"#/components/schemas/Planning"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Planning"
+responses	
+200	
+description	"OK"
+/api/Planning/{id}	
+get	
+tags	
+0	"Planning"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Planning"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Planning"
+text/json	
+schema	
+$ref	"#/components/schemas/Planning"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Planning"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Planning"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/ProfessionalCategory	
+get	
+tags	
+0	"ProfessionalCategory"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"ProfessionalCategory"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/ProfessionalCategory"
+text/json	
+schema	
+$ref	"#/components/schemas/ProfessionalCategory"
+application/*+json	
+schema	
+$ref	"#/components/schemas/ProfessionalCategory"
+responses	
+200	
+description	"OK"
+/api/ProfessionalCategory/{id}	
+get	
+tags	
+0	"ProfessionalCategory"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"ProfessionalCategory"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/ProfessionalCategory"
+text/json	
+schema	
+$ref	"#/components/schemas/ProfessionalCategory"
+application/*+json	
+schema	
+$ref	"#/components/schemas/ProfessionalCategory"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"ProfessionalCategory"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Province	
+get	
+tags	
+0	"Province"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Province"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Province"
+text/json	
+schema	
+$ref	"#/components/schemas/Province"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Province"
+responses	
+200	
+description	"OK"
+/api/Province/{id}	
+get	
+tags	
+0	"Province"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Province"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Province"
+text/json	
+schema	
+$ref	"#/components/schemas/Province"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Province"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Province"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Region	
+get	
+tags	
+0	"Region"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Region"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Region"
+text/json	
+schema	
+$ref	"#/components/schemas/Region"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Region"
+responses	
+200	
+description	"OK"
+/api/Region/{id}	
+get	
+tags	
+0	"Region"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Region"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Region"
+text/json	
+schema	
+$ref	"#/components/schemas/Region"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Region"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Region"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Relationship	
+get	
+tags	
+0	"Relationship"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Relationship"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Relationship"
+text/json	
+schema	
+$ref	"#/components/schemas/Relationship"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Relationship"
+responses	
+200	
+description	"OK"
+/api/Relationship/{id}	
+get	
+tags	
+0	"Relationship"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Relationship"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Relationship"
+text/json	
+schema	
+$ref	"#/components/schemas/Relationship"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Relationship"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Relationship"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Shift	
+get	
+tags	
+0	"Shift"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Shift"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Shift"
+text/json	
+schema	
+$ref	"#/components/schemas/Shift"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Shift"
+responses	
+200	
+description	"OK"
+/api/Shift/{id}	
+get	
+tags	
+0	"Shift"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Shift"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Shift"
+text/json	
+schema	
+$ref	"#/components/schemas/Shift"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Shift"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Shift"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/Site	
+get	
+tags	
+0	"Site"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Site"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/SiteDto"
+text/json	
+schema	
+$ref	"#/components/schemas/SiteDto"
+application/*+json	
+schema	
+$ref	"#/components/schemas/SiteDto"
+responses	
+200	
+description	"OK"
+/api/Site/{id}	
+get	
+tags	
+0	"Site"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Site"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/SiteDto"
+text/json	
+schema	
+$ref	"#/components/schemas/SiteDto"
+application/*+json	
+schema	
+$ref	"#/components/schemas/SiteDto"
+responses	
+200	
+description	"OK"
+/api/Timesheet/DailyResume/UserId/{userId}	
+get	
+tags	
+0	"Timesheet"
+parameters	
+0	
+name	"userId"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+/api/Timesheet/Resume/UserId/{userId}/scope/{scope}	
+get	
+tags	
+0	"Timesheet"
+parameters	
+0	
+name	"userId"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+1	
+name	"scope"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int32"
+responses	
+200	
+description	"OK"
+/api/Timesheet	
+get	
+tags	
+0	"Timesheet"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Timesheet"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Timesheet"
+text/json	
+schema	
+$ref	"#/components/schemas/Timesheet"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Timesheet"
+responses	
+200	
+description	"OK"
+/api/Timesheet/{id}	
+get	
+tags	
+0	"Timesheet"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Timesheet"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Timesheet"
+text/json	
+schema	
+$ref	"#/components/schemas/Timesheet"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Timesheet"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Timesheet"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/TimesheetType/GetByParentId/{parentId}	
+get	
+tags	
+0	"TimesheetType"
+parameters	
+0	
+name	"parentId"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+/api/Town	
+get	
+tags	
+0	"Town"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"Town"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Town"
+text/json	
+schema	
+$ref	"#/components/schemas/Town"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Town"
+responses	
+200	
+description	"OK"
+/api/Town/{id}	
+get	
+tags	
+0	"Town"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"Town"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/Town"
+text/json	
+schema	
+$ref	"#/components/schemas/Town"
+application/*+json	
+schema	
+$ref	"#/components/schemas/Town"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"Town"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+/api/User	
+get	
+tags	
+0	"User"
+parameters	
+0	
+name	"range"
+in	"query"
+schema	
+type	"string"
+default	"[]"
+1	
+name	"sort"
+in	"query"
+schema	
+type	"string"
+default	'["id","ASC"]'
+2	
+name	"filter"
+in	"query"
+schema	
+type	"string"
+default	"[{}]"
+responses	
+200	
+description	"OK"
+post	
+tags	
+0	"User"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/User"
+text/json	
+schema	
+$ref	"#/components/schemas/User"
+application/*+json	
+schema	
+$ref	"#/components/schemas/User"
+responses	
+200	
+description	"OK"
+/api/User/{id}	
+get	
+tags	
+0	"User"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+responses	
+200	
+description	"OK"
+put	
+tags	
+0	"User"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"integer"
+format	"int64"
+requestBody	
+content	
+application/json	
+schema	
+$ref	"#/components/schemas/User"
+text/json	
+schema	
+$ref	"#/components/schemas/User"
+application/*+json	
+schema	
+$ref	"#/components/schemas/User"
+responses	
+200	
+description	"OK"
+delete	
+tags	
+0	"User"
+parameters	
+0	
+name	"id"
+in	"path"
+required	true
+schema	
+type	"string"
+requestBody	
+content	
+application/json	
+schema	{}
+text/json	
+schema	{}
+application/*+json	
+schema	{}
+responses	
+200	
+description	"OK"
+components	
+schemas	
+Bank	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+additionalProperties	false
+City	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+provinceId	
+type	"integer"
+format	"int64"
+province	
+$ref	"#/components/schemas/Province"
+towns	
+type	"array"
+items	
+$ref	"#/components/schemas/Town"
+nullable	true
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+sites	
+type	"array"
+items	
+$ref	"#/components/schemas/Site"
+nullable	true
+additionalProperties	false
+ContractType	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+additionalProperties	false
+Country	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+provinces	
+type	"array"
+items	
+$ref	"#/components/schemas/Province"
+nullable	true
+additionalProperties	false
+Employee	
+required	
+0	"firstName"
+1	"lastName"
+2	"matricule"
+3	"placeOfBirth"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+matricule	
+maxLength	20
+minLength	0
+type	"string"
+firstName	
+maxLength	256
+minLength	0
+type	"string"
+lastName	
+maxLength	256
+minLength	0
+type	"string"
+placeOfBirth	
+maxLength	256
+minLength	0
+type	"string"
+dateOfBirth	
+type	"string"
+format	"date-time"
+gender	
+type	"integer"
+format	"int32"
+photo	
+type	"string"
+nullable	true
+socialSecurityNumber	
+maxLength	50
+minLength	0
+type	"string"
+nullable	true
+contractTypeId	
+type	"integer"
+format	"int64"
+nullable	true
+contractType	
+$ref	"#/components/schemas/ContractType"
+contractStartDate	
+type	"string"
+format	"date-time"
+nullable	true
+contractEndDate	
+type	"string"
+format	"date-time"
+nullable	true
+dependentsCount	
+type	"integer"
+format	"int32"
+nullable	true
+functionId	
+type	"integer"
+format	"int64"
+nullable	true
+function	
+$ref	"#/components/schemas/Function"
+professionalCategoryId	
+type	"integer"
+format	"int64"
+nullable	true
+professionalCategory	
+$ref	"#/components/schemas/ProfessionalCategory"
+gradeId	
+type	"integer"
+format	"int64"
+nullable	true
+grade	
+$ref	"#/components/schemas/Grade"
+dailySalary	
+type	"number"
+format	"double"
+nullable	true
+transportationAllowance	
+type	"number"
+format	"double"
+nullable	true
+regionId	
+type	"integer"
+format	"int64"
+nullable	true
+region	
+$ref	"#/components/schemas/Region"
+provinceId	
+type	"integer"
+format	"int64"
+province	
+$ref	"#/components/schemas/Province"
+cityId	
+type	"integer"
+format	"int64"
+city	
+$ref	"#/components/schemas/City"
+townId	
+type	"integer"
+format	"int64"
+town	
+$ref	"#/components/schemas/Town"
+address	
+type	"string"
+nullable	true
+notes	
+type	"string"
+nullable	true
+contactPerson	
+maxLength	256
+minLength	0
+type	"string"
+nullable	true
+relationshipId	
+type	"integer"
+format	"int64"
+nullable	true
+relationship	
+$ref	"#/components/schemas/Relationship"
+contactPersonPhone	
+maxLength	50
+minLength	0
+type	"string"
+nullable	true
+personalPhone	
+maxLength	50
+minLength	0
+type	"string"
+nullable	true
+personalEmail	
+maxLength	256
+minLength	0
+type	"string"
+nullable	true
+bankAccountNumber	
+maxLength	256
+minLength	0
+type	"string"
+nullable	true
+bankId	
+type	"integer"
+format	"int64"
+nullable	true
+bank	
+$ref	"#/components/schemas/Bank"
+sites	
+type	"array"
+items	
+$ref	"#/components/schemas/EmployeeSite"
+nullable	true
+relationships	
+type	"array"
+items	
+$ref	"#/components/schemas/EmployeeRelationship"
+nullable	true
+user	
+$ref	"#/components/schemas/User"
+additionalProperties	false
+EmployeeDto	
+required	
+0	"firstName"
+1	"lastName"
+2	"matricule"
+3	"placeOfBirth"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+matricule	
+maxLength	20
+minLength	0
+type	"string"
+firstName	
+maxLength	256
+minLength	0
+type	"string"
+lastName	
+maxLength	256
+minLength	0
+type	"string"
+placeOfBirth	
+maxLength	256
+minLength	0
+type	"string"
+dateOfBirth	
+type	"string"
+format	"date-time"
+gender	
+type	"integer"
+format	"int32"
+photo	
+nullable	true
+socialSecurityNumber	
+maxLength	50
+minLength	0
+type	"string"
+nullable	true
+contractTypeId	
+type	"integer"
+format	"int64"
+nullable	true
+contractType	
+$ref	"#/components/schemas/ContractType"
+contractStartDate	
+type	"string"
+format	"date-time"
+nullable	true
+contractEndDate	
+type	"string"
+format	"date-time"
+nullable	true
+dependentsCount	
+type	"integer"
+format	"int32"
+nullable	true
+functionId	
+type	"integer"
+format	"int64"
+nullable	true
+function	
+$ref	"#/components/schemas/Function"
+professionalCategoryId	
+type	"integer"
+format	"int64"
+nullable	true
+professionalCategory	
+$ref	"#/components/schemas/ProfessionalCategory"
+gradeId	
+type	"integer"
+format	"int64"
+nullable	true
+grade	
+$ref	"#/components/schemas/Grade"
+dailySalary	
+type	"number"
+format	"double"
+nullable	true
+transportationAllowance	
+type	"number"
+format	"double"
+nullable	true
+regionId	
+type	"integer"
+format	"int64"
+nullable	true
+region	
+$ref	"#/components/schemas/Region"
+provinceId	
+type	"integer"
+format	"int64"
+province	
+$ref	"#/components/schemas/Province"
+cityId	
+type	"integer"
+format	"int64"
+city	
+$ref	"#/components/schemas/City"
+townId	
+type	"integer"
+format	"int64"
+town	
+$ref	"#/components/schemas/Town"
+address	
+type	"string"
+nullable	true
+notes	
+type	"string"
+nullable	true
+contactPerson	
+maxLength	256
+minLength	0
+type	"string"
+nullable	true
+relationshipId	
+type	"integer"
+format	"int64"
+nullable	true
+relationship	
+$ref	"#/components/schemas/Relationship"
+contactPersonPhone	
+maxLength	50
+minLength	0
+type	"string"
+nullable	true
+personalPhone	
+maxLength	50
+minLength	0
+type	"string"
+nullable	true
+personalEmail	
+maxLength	256
+minLength	0
+type	"string"
+nullable	true
+bankAccountNumber	
+maxLength	256
+minLength	0
+type	"string"
+nullable	true
+bankId	
+type	"integer"
+format	"int64"
+nullable	true
+bank	
+$ref	"#/components/schemas/Bank"
+sites	
+type	"array"
+items	
+type	"integer"
+format	"int64"
+nullable	true
+relationships	
+type	"array"
+items	
+$ref	"#/components/schemas/EmployeeRelationship"
+nullable	true
+user	
+$ref	"#/components/schemas/User"
+additionalProperties	false
+EmployeeRelationship	
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+employeeId	
+type	"integer"
+format	"int64"
+employee	
+$ref	"#/components/schemas/Employee"
+relationshipId	
+type	"integer"
+format	"int64"
+relationship	
+$ref	"#/components/schemas/Relationship"
+firstName	
+type	"string"
+nullable	true
+placeOfBirth	
+type	"string"
+nullable	true
+dateOfBirth	
+type	"string"
+format	"date-time"
+nullable	true
+gender	
+type	"integer"
+format	"int32"
+file	
+type	"string"
+nullable	true
+additionalProperties	false
+EmployeeSite	
+type	"object"
+properties	
+employeeId	
+type	"integer"
+format	"int64"
+employee	
+$ref	"#/components/schemas/Employee"
+siteId	
+type	"integer"
+format	"int64"
+site	
+$ref	"#/components/schemas/Site"
+additionalProperties	false
+Function	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+additionalProperties	false
+Grade	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+additionalProperties	false
+Login	
+type	"object"
+properties	
+email	
+type	"string"
+nullable	true
+password	
+type	"string"
+nullable	true
+additionalProperties	false
+Planning	
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+startDate	
+type	"string"
+format	"date-time"
+endDate	
+type	"string"
+format	"date-time"
+hours	
+type	"integer"
+format	"int32"
+userId	
+type	"integer"
+format	"int64"
+user	
+$ref	"#/components/schemas/User"
+siteId	
+type	"integer"
+format	"int32"
+site	
+$ref	"#/components/schemas/Site"
+superUserId	
+type	"integer"
+format	"int64"
+superUser	
+$ref	"#/components/schemas/User"
+timesheets	
+type	"array"
+items	
+$ref	"#/components/schemas/Timesheet"
+nullable	true
+additionalProperties	false
+ProfessionalCategory	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+additionalProperties	false
+Province	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+countryId	
+type	"integer"
+format	"int64"
+country	
+$ref	"#/components/schemas/Country"
+cities	
+type	"array"
+items	
+$ref	"#/components/schemas/City"
+nullable	true
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+sites	
+type	"array"
+items	
+$ref	"#/components/schemas/Site"
+nullable	true
+additionalProperties	false
+Region	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+additionalProperties	false
+Relationship	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+employeeRelationships	
+type	"array"
+items	
+$ref	"#/components/schemas/EmployeeRelationship"
+nullable	true
+additionalProperties	false
+Shift	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+startTime	
+type	"string"
+format	"date-span"
+endTime	
+type	"string"
+format	"date-span"
+sites	
+type	"array"
+items	
+$ref	"#/components/schemas/SiteShift"
+nullable	true
+additionalProperties	false
+Site	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+provinceId	
+type	"integer"
+format	"int64"
+province	
+$ref	"#/components/schemas/Province"
+cityId	
+type	"integer"
+format	"int64"
+city	
+$ref	"#/components/schemas/City"
+townId	
+type	"integer"
+format	"int64"
+town	
+$ref	"#/components/schemas/Town"
+longitude	
+type	"number"
+format	"double"
+latitude	
+type	"number"
+format	"double"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/EmployeeSite"
+nullable	true
+shifts	
+type	"array"
+items	
+$ref	"#/components/schemas/SiteShift"
+nullable	true
+additionalProperties	false
+SiteDto	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+provinceId	
+type	"integer"
+format	"int64"
+province	
+$ref	"#/components/schemas/Province"
+cityId	
+type	"integer"
+format	"int64"
+city	
+$ref	"#/components/schemas/City"
+townId	
+type	"integer"
+format	"int64"
+town	
+$ref	"#/components/schemas/Town"
+longitude	
+type	"number"
+format	"double"
+latitude	
+type	"number"
+format	"double"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/EmployeeSite"
+nullable	true
+shifts	
+type	"array"
+items	
+type	"integer"
+format	"int64"
+nullable	true
+additionalProperties	false
+SiteShift	
+type	"object"
+properties	
+siteId	
+type	"integer"
+format	"int64"
+site	
+$ref	"#/components/schemas/Site"
+shiftId	
+type	"integer"
+format	"int64"
+shift	
+$ref	"#/components/schemas/Shift"
+additionalProperties	false
+Timesheet	
+required	
+0	"details"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+code	
+type	"string"
+nullable	true
+start	
+type	"string"
+format	"date-time"
+end	
+type	"string"
+format	"date-time"
+nullable	true
+details	
+maxLength	256
+minLength	0
+type	"string"
+planningId	
+type	"integer"
+format	"int64"
+planning	
+$ref	"#/components/schemas/Planning"
+timesheetTypeId	
+type	"integer"
+format	"int64"
+nullable	true
+timeSheetType	
+$ref	"#/components/schemas/TimesheetType"
+additionalProperties	false
+TimesheetType	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+parentId	
+type	"integer"
+format	"int64"
+nullable	true
+parent	
+$ref	"#/components/schemas/TimesheetType"
+children	
+type	"array"
+items	
+$ref	"#/components/schemas/TimesheetType"
+nullable	true
+timesheets	
+type	"array"
+items	
+$ref	"#/components/schemas/Timesheet"
+nullable	true
+additionalProperties	false
+Town	
+required	
+0	"name"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+name	
+maxLength	256
+minLength	0
+type	"string"
+cityId	
+type	"integer"
+format	"int64"
+city	
+$ref	"#/components/schemas/City"
+employees	
+type	"array"
+items	
+$ref	"#/components/schemas/Employee"
+nullable	true
+sites	
+type	"array"
+items	
+$ref	"#/components/schemas/Site"
+nullable	true
+additionalProperties	false
+User	
+required	
+0	"displayName"
+1	"password"
+2	"userName"
+type	"object"
+properties	
+id	
+type	"integer"
+format	"int64"
+createdAt	
+type	"string"
+format	"date-time"
+createdBy	
+type	"integer"
+format	"int64"
+updatedAt	
+type	"string"
+format	"date-time"
+updatedBy	
+type	"integer"
+format	"int64"
+isDeleted	
+type	"boolean"
+displayName	
+maxLength	256
+minLength	0
+type	"string"
+userName	
+maxLength	256
+minLength	0
+type	"string"
+password	
+maxLength	256
+minLength	0
+type	"string"
+employeeId	
+type	"integer"
+format	"int64"
+nullable	true
+employee	
+$ref	"#/components/schemas/Employee"
+plannings	
+type	"array"
+items	
+$ref	"#/components/schemas/Planning"
+nullable	true
+additionalProperties	false
+
+Revert
+Je vois que vous avez partagé la documentation complète de l'API REST pour votre application de pointage. Voici un résumé des points clés et comment nous pouvons avancer :
+
+Points clés de l'API
+URL de base : https://timesheetapp.azurewebsites.net/api
+Authentification : JWT Token
+Identifiants de test :
+Email: Test@test.com
+Mot de passe: test123
+Endpoints principaux
+Authentification :
+POST /api/Auth/login - Connexion utilisateur
+GET /api/Auth/users/{userId} - Récupérer un utilisateur
+Gestion des employés :
+GET /api/Employee - Liste des employés
+POST /api/Employee - Créer un employé
+GET /api/Employee/{id} - Détails d'un employé
+Pointage :
+POST /api/Timesheet - Enregistrer un pointage
+GET /api/Timesheet/DailyResume/UserId/{userId} - Récapitulatif quotidien
+Sites et plannings :
+GET /api/Site - Liste des sites
+GET /api/Planning - Liste des plannings
+Prochaines étapes
+Créer un service d'authentification pour gérer le JWT
+Développer les écrans principaux :
+Connexion
+Scan QR
+Tableau de bord
+Gestion des pointages
+Souhaitez-vous que je commence par implémenter un composant spécifique ? Par exemple, je pourrais commencer par :
+
+Le service d'authentification
+L'écran de connexion
+Le scanner QR
+L'affichage du tableau de bord
+Quelle partie préférez-vous que j'aborde en premier ?
+
+Feedback submitted
+Me
+
+tu peux faire deux applications un pour le lieu de travail et l'autre pour les employés qui viendront scanné pour leurs pointages. et ces applications peut il se faire avec flutter? ou tu as d'autres suggestions 
+
+Revert
+Je vais vous proposer une architecture pour les deux applications Flutter, qui est une excellente solution pour ce cas d'usage. Flutter permet de développer pour iOS, Android et le web avec un seul code source.
+
+Architecture proposée
+1. Application Employés (Pointage)
+Fonctionnalités principales :
+
+Connexion sécurisée
+Scan de QR code
+Affichage des informations de pointage
+Historique des pointages
+Géolocalisation
+Structure du projet :
+
+lib/
+├── features/
+│   ├── auth/           # Authentification
+│   ├── qr_scanner/     # Scanner QR
+│   ├── dashboard/      # Tableau de bord
+│   └── profile/        # Profil utilisateur
+├── core/
+│   ├── api/            # Services API
+│   ├
+Cascade error
+Unavailable: Encountered retryable error from model provider: an internal error occurred (error ID: d046f7415baf48108b4f928f0745c983)
+Je vais vous proposer une architecture pour les deux applications Flutter, qui est une excellente solution pour ce cas d'usage. Flutter permet de développer pour iOS, Android et le web avec un seul code source.
+
+Architecture proposée
+1. Application Employés (Pointage)
+Fonctionnalités principales :
+
+Connexion sécurisée
+Scan de QR code
+Affichage des informations de pointage
+Historique des pointages
+Géolocalisation
+Structure du projet :
+
+lib/
+├── features/
+│   ├── auth/           # Authentification
+│   ├── qr_scanner/     # Scanner QR
+│   ├── dashboard/      # Tableau de bord
+│   └── profile/        # Profil utilisateur
+├── core/
+│   ├── api/            # Services API
+│   ├── models/         # Modèles de données
+│   ├── utils/          # Utilitaires
+│   └── widgets/        # Composants réutilisables
+└── app.dart            # Configuration de l'application
+2. Application Gestion (Lieu de travail)
+Fonctionnalités principales :
+
+Gestion des employés
+Génération de QR codes
+Suivi des présences en temps réel
+Rapports et statistiques
+Gestion des plannings
+Structure du projet :
+
+lib/
+├── features/
+│   ├── auth/           # Authentification admin
+│   ├── employees/      # Gestion employés
+│   ├── qr_generator/   # Générateur QR
+│   ├── attendance/     # Suivi des présences
+│   └── reports/        # Rapports
+├── core/
+│   ├── api/
+│   ├── models/
+│   ├── utils/
+│   └── widgets/
+└── app.dart
+Pourquoi Flutter ?
+Multiplateforme : Un seul code pour iOS, Android et web
+Performances : Compilation native pour des performances optimales
+Développement rapide : Hot Reload pour un développement fluide
+Écosystème riche : Nombreux packages disponibles (QR, cartes, etc.)
+UI/UX moderne : Widgets Material Design et Cupertino
+Alternatives à considérer
+React Native :
+Avantages : Basé sur JavaScript, grande communauté
+Inconvénients : Performances légèrement inférieures à Flutter
+Solution hybride web (PWA) :
+Avantages : Déploiement simplifié
+Inconvénients : Accès limité aux fonctionnalités natives
+Solution native (Kotlin/Swift) :
+Avantages : Performances optimales
+Inconvénients : Développement et maintenance plus coûteux
+Prochaines étapes
+Je peux commencer par implémenter :
+
+La structure de base des deux applications
+L'authentification JWT
+Le scanner QR pour l'application employé
+Le générateur QR pour l'application gestion
+Par quelle partie souhaitez-vous que je commence ?
+
+🚀 Prochaines Étapes
+Maintenant que l'application employé est terminée, voulez-vous que je :
+Créer l'application admin pour la gestion et génération de QR codes
+Tester l'application employé en mode web/mobile
+Ajouter des fonctionnalités supplémentaires (historique, paramètres, etc.)
+Créer la documentation complète pour les deux applications
