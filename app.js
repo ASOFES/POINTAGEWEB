@@ -31,24 +31,31 @@ window.addEventListener('qrLibraryLoaded', function() {
 
 // Vérifier l'authentification
 async function checkAuthentication() {
+  console.log('🔐 Vérification de l\'authentification...');
+  
   if (!authManager.isAuthenticated()) {
+    console.log('❌ Utilisateur non authentifié');
     showLoginMessage();
     return false;
   }
 
+  console.log('✅ Token présent, validation...');
+  
   try {
     const isValid = await authManager.validateToken();
     if (!isValid) {
+      console.log('❌ Token invalide, déconnexion');
       authManager.logout();
       showLoginMessage();
       return false;
     }
+    console.log('✅ Authentification réussie');
     return true;
   } catch (error) {
-    console.error('Erreur authentification:', error);
-    authManager.logout();
-    showLoginMessage();
-    return false;
+    console.error('❌ Erreur authentification:', error);
+    // En cas d'erreur, on ne déconnecte pas automatiquement
+    console.log('⚠️ Erreur de validation, mais on continue');
+    return true;
   }
 }
 

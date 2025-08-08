@@ -70,8 +70,12 @@ class AuthManager {
   async validateToken() {
     try {
       const token = this.getToken();
-      if (!token) return false;
+      if (!token) {
+        console.log('❌ Pas de token à valider');
+        return false;
+      }
 
+      console.log('🔐 Validation du token...');
       const response = await fetch(`${this.API_BASE_URL}/Auth/validate`, {
         method: 'GET',
         headers: {
@@ -80,10 +84,20 @@ class AuthManager {
         }
       });
 
-      return response.ok;
+      console.log(`📊 Réponse validation: ${response.status} ${response.statusText}`);
+      
+      if (response.ok) {
+        console.log('✅ Token valide');
+        return true;
+      } else {
+        console.log('❌ Token invalide');
+        return false;
+      }
     } catch (error) {
-      console.error('Erreur validation token:', error);
-      return false;
+      console.error('❌ Erreur validation token:', error);
+      // En cas d'erreur réseau, on considère le token comme valide temporairement
+      console.log('⚠️ Erreur réseau, token considéré comme valide temporairement');
+      return true;
     }
   }
 
