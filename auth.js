@@ -1,7 +1,7 @@
 // Gestionnaire d'authentification pour l'application TimeSheet
 class AuthManager {
   constructor() {
-    this.API_BASE_URL = 'https://your-api-domain.com/api'; // À remplacer par votre URL API
+    this.API_BASE_URL = 'https://api.pointage.com/api'; // URL de votre API de production
     this.tokenKey = 'timesheet_token';
     this.userKey = 'timesheet_user';
   }
