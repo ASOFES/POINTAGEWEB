@@ -112,14 +112,28 @@ class AuthManager {
     if (!this.getToken()) return;
 
     try {
-      // Récupérer l'utilisateur connecté via l'API Auth
-      const response = await fetch(`${this.API_BASE_URL}/Auth/users/1`, {
+      console.log('🔄 Chargement des informations utilisateur...');
+      
+      // Première tentative : avec en-tête Authorization
+      let response = await fetch(`${this.API_BASE_URL}/Auth/users/1`, {
         method: 'GET',
         headers: this.getAuthHeaders()
       });
 
+      // Si ça échoue à cause du CORS, essayer sans en-tête Authorization
+      if (!response.ok && response.status === 0) {
+        console.log('⚠️ Problème CORS détecté, tentative sans en-tête Authorization...');
+        response = await fetch(`${this.API_BASE_URL}/Auth/users/1`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+
       if (response.ok) {
         const data = await response.json();
+        console.log('📋 Données utilisateur reçues:', data);
         
         // L'API retourne une liste d'utilisateurs, prenons le premier
         if (Array.isArray(data) && data.length > 0) {
@@ -133,10 +147,11 @@ class AuthManager {
           throw new Error('Format de réponse inattendu');
         }
       } else {
+        console.log(`⚠️ Erreur ${response.status}: ${response.statusText}`);
         throw new Error(`Erreur ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de l\'utilisateur:', error);
+      console.error('❌ Erreur lors du chargement de l\'utilisateur:', error);
       // Créer un utilisateur par défaut si nécessaire
       const defaultUser = {
         id: 1,
