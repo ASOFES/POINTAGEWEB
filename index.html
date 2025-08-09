@@ -74,92 +74,114 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
       min-height: 100vh;
-      color: #333;
+      color: #2c3e50;
+      line-height: 1.6;
     }
 
     .header {
-      background: #1976D2;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 15px 20px;
+      padding: 20px 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
     }
 
     .header h1 {
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(45deg, #fff, #f0f8ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .user-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
     }
 
     .logout-btn {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.15);
       color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 25px;
       cursor: pointer;
       font-size: 14px;
-      transition: all 0.3s ease;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
     }
 
     .logout-btn:hover {
-      background: rgba(255,255,255,0.3);
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .container {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: 25px auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.3);
       overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .user-header {
-      padding: 20px;
-      background: white;
-      border-bottom: 1px solid #e0e0e0;
+      padding: 30px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+      border-bottom: 1px solid rgba(103, 126, 234, 0.1);
     }
 
     .user-card {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
 
     .user-avatar {
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-      background: #1976D2;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 28px;
+      font-weight: 700;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      border: 3px solid rgba(255, 255, 255, 0.3);
     }
 
     .user-details h3 {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 4px;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      letter-spacing: -0.3px;
     }
 
     .user-details p {
       font-size: 16px;
-      color: #666;
-      margin-bottom: 4px;
+      color: #64748b;
+      margin-bottom: 6px;
+      font-weight: 500;
     }
 
 
@@ -195,45 +217,70 @@
     }
 
     .btn {
-      background: #1976D2;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      padding: 12px 24px;
-      border-radius: 25px;
+      padding: 14px 28px;
+      border-radius: 50px;
       font-size: 16px;
+      font-weight: 600;
       cursor: pointer;
       margin: 10px;
-      transition: all 0.3s ease;
-      box-shadow: 0 3px 10px rgba(25, 118, 210, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
     }
 
     .btn:hover {
-      background: #1565C0;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
     }
 
     .btn:disabled {
-      background: #ccc;
+      background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%);
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
+      box-shadow: 0 4px 15px rgba(148, 163, 184, 0.2);
     }
 
     .btn-success {
-      background: #4CAF50;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
     }
 
     .btn-success:hover {
-      background: #45a049;
+      box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
     }
 
     .btn-warning {
-      background: #FF9800;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
     }
 
     .btn-warning:hover {
-      background: #F57C00;
+      box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
     }
 
     .history-section {
@@ -323,60 +370,87 @@
 
     .nav-tabs {
       display: flex;
-      background: #f8f9fa;
-      border-bottom: 1px solid #e0e0e0;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-bottom: 1px solid rgba(103, 126, 234, 0.1);
+      position: relative;
     }
 
     .nav-tab {
       flex: 1;
-      padding: 15px;
+      padding: 18px 12px;
       text-align: center;
       cursor: pointer;
       border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 500;
+      font-size: 14px;
+      color: #64748b;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-tab::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-tab:hover::before {
+      left: 100%;
     }
 
     .nav-tab.active {
-      border-bottom-color: #1976D2;
-      background: white;
-      color: #1976D2;
-      font-weight: bold;
+      border-bottom-color: #667eea;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      color: #667eea;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
     }
 
     .nav-tab:hover {
-      background: #e3f2fd;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      color: #667eea;
+      transform: translateY(-1px);
     }
 
     .status {
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 10px;
-      font-weight: 500;
+      padding: 18px 24px;
+      margin: 25px 0;
+      border-radius: 16px;
+      font-weight: 600;
       text-align: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
 
     .status.info {
-      background: #E3F2FD;
-      color: #1976D2;
-      border: 1px solid #BBDEFB;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      color: #667eea;
+      border: 1px solid rgba(102, 126, 234, 0.2);
     }
 
     .status.success {
-      background: #E8F5E8;
-      color: #2E7D32;
-      border: 1px solid #C8E6C9;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.2);
     }
 
     .status.error {
-      background: #FFEBEE;
-      color: #C62828;
-      border: 1px solid #FFCDD2;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
     }
 
     .status.warning {
-      background: #FFF3E0;
-      color: #E65100;
-      border: 1px solid #FFCC02;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.2);
     }
 
     .loading {
@@ -509,93 +583,104 @@
 
     <!-- Section Tableau de bord -->
     <div id="dashboard-section" class="dashboard-section active">
-      <div style="padding: 20px; text-align: center;">
-        <h2 style="color: #1976D2; margin-bottom: 15px;">🏠 Bienvenue dans votre espace de pointage</h2>
-        <p style="color: #666; margin-bottom: 20px;">Utilisez la navigation ci-dessus pour accéder aux différentes fonctionnalités</p>
-        <button onclick="refreshData()" class="btn" style="margin: 10px;">🔄 Actualiser les données</button>
-      </div>
-
-      <!-- Pointages récents -->
-      <div style="padding: 20px;">
-        <h3 style="color: #1976D2; margin-bottom: 15px;">📅 Pointages Récents</h3>
-        <div id="recentTimesheets">
-          <div class="loading">
-            <div class="spinner"></div>
-            <span>Chargement des pointages récents...</span>
-          </div>
+      <div style="padding: 40px 30px; text-align: center;">
+        <div style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+          <!-- Informations principales en haut -->
+          <h2 style="color: #2c3e50; font-size: 24px; font-weight: 700; margin-bottom: 8px;" id="userNameDash">Utilisateur</h2>
+          <p style="color: #64748b; font-size: 16px; margin-bottom: 4px;" id="userRoleDash">Employé</p>
+          <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;" id="userEmailDash">email@example.com</p>
+          
+          <!-- Avatar et salutation en bas -->
+          <div style="width: 80px; height: 80px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: white; font-size: 36px; font-weight: 700;" id="userAvatarDash">U</div>
+          <p style="color: #64748b; font-size: 16px; text-align: center;">Bonjour !</p>
         </div>
       </div>
     </div>
 
     <!-- Section Scanner QR -->
     <div id="scanner-section" class="scanner-section">
-      <h3 class="scanner-title">📷 Scanner QR Code</h3>
-      <div id="reader"></div>
-      <div id="scanStatus" class="status info">
-        Scanner prêt - Placez le QR code dans le cadre
-      </div>
-      <div class="scanner-controls">
-        <button id="startScanButton" onclick="startScanner()" class="btn btn-success">
-          🚀 Démarrer le Scanner
-        </button>
-        <button id="stopScanButton" onclick="stopScanner()" class="btn btn-warning" style="display: none;">
-          ⏹️ Arrêter le Scanner
-        </button>
-        <button onclick="testScanner()" class="btn">
-          🧪 Tester le Scanner
-        </button>
+      <div style="padding: 30px;">
+        <div style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;">
+          <h3 style="color: #2c3e50; font-size: 22px; font-weight: 700; margin-bottom: 25px;">📷 Scanner QR Code</h3>
+          
+          <div id="reader" style="max-width: 300px; margin: 0 auto 20px;"></div>
+          
+          <div id="scanStatus" class="status info">
+            Scanner prêt - Placez le QR code dans le cadre
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button id="startScanButton" onclick="startScanner()" class="btn btn-success">
+              🚀 Démarrer le Scanner
+            </button>
+            <button id="stopScanButton" onclick="stopScanner()" class="btn btn-warning" style="display: none;">
+              ⏹️ Arrêter le Scanner
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Section Historique -->
     <div id="history-section" class="history-section">
-      <h3 class="history-title">📊 Historique des Pointages</h3>
-      <div style="margin-bottom: 15px;">
-        <button onclick="loadHistory()" class="btn">🔄 Actualiser</button>
-        <button onclick="exportHistory()" class="btn btn-success">📤 Exporter</button>
-      </div>
-      <div style="overflow-x: auto;">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>📅 Date/Heure</th>
-              <th>🏷️ Code</th>
-              <th>⏰ Type</th>
-              <th>✅ Statut</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody">
-            <!-- Rempli dynamiquement -->
-          </tbody>
-        </table>
+      <div style="padding: 30px;">
+        <div style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+          <h3 style="color: #2c3e50; font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: center;">📊 Historique des Pointages</h3>
+          
+          <div style="text-align: center; margin-bottom: 20px;">
+            <button onclick="loadHistory()" class="btn">🔄 Actualiser</button>
+            <button onclick="exportHistory()" class="btn btn-success">📤 Exporter</button>
+          </div>
+          
+          <div style="overflow-x: auto;">
+            <table class="history-table">
+              <thead>
+                <tr>
+                  <th>📅 Date/Heure</th>
+                  <th>🏷️ Code</th>
+                  <th>⏰ Type</th>
+                  <th>✅ Statut</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <!-- Rempli dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Section Profil -->
     <div id="profile-section" class="profile-section">
-      <h3 class="profile-title">👤 Profil Utilisateur</h3>
-      <div class="profile-info">
-        <div class="profile-item">
-          <span class="profile-label">Nom complet:</span>
-          <span class="profile-value" id="profileName">-</span>
+      <div style="padding: 30px;">
+        <div style="background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+          <h3 style="color: #2c3e50; font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: center;">👤 Profil Utilisateur</h3>
+          
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 600; color: #64748b;">Nom complet:</span>
+              <span style="color: #2c3e50;" id="profileName">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 600; color: #64748b;">Email:</span>
+              <span style="color: #2c3e50;" id="profileEmail">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 600; color: #64748b;">Rôle:</span>
+              <span style="color: #2c3e50;" id="profileRole">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+              <span style="font-weight: 600; color: #64748b;">Statut:</span>
+              <span style="color: #10b981;" id="profileStatus">-</span>
+            </div>
+          </div>
+          
+          <div style="text-align: center;">
+            <button onclick="refreshProfile()" class="btn">🔄 Actualiser Profil</button>
+            <button onclick="logout()" class="btn btn-warning">🚪 Déconnexion</button>
+          </div>
         </div>
-        <div class="profile-item">
-          <span class="profile-label">Email:</span>
-          <span class="profile-value" id="profileEmail">-</span>
-        </div>
-        <div class="profile-item">
-          <span class="profile-label">Rôle:</span>
-          <span class="profile-value" id="profileRole">-</span>
-        </div>
-        <div class="profile-item">
-          <span class="profile-label">Statut:</span>
-          <span class="profile-value" id="profileStatus">-</span>
-        </div>
-      </div>
-      
-      <div style="margin-top: 20px;">
-        <button onclick="refreshProfile()" class="btn">🔄 Actualiser Profil</button>
-        <button onclick="logout()" class="btn btn-warning">🚪 Déconnexion</button>
       </div>
     </div>
   </div>
