@@ -234,6 +234,10 @@ function onScanSuccess(decodedText, decodedResult) {
     return;
   }
   
+  // Arrêter le scanner immédiatement après détection
+  console.log('📷 Arrêt automatique du scanner après détection');
+  stopScanner();
+  
   // Marquer comme en traitement
   isProcessing = true;
   lastScannedQR = decodedText;
@@ -417,11 +421,15 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
       showSuccessMessage('✅ Pointage automatique enregistré avec succès!');
       console.log('✅ Timesheet créé avec ID:', result.id);
       
+      // Mettre à jour le statut pour informer l'utilisateur
+      updateStatus('✅ QR scanné avec succès ! Scanner arrêté automatiquement.', 'success');
+      
       // Recharger l'historique
       await loadHistory();
     } else {
       const errorData = await response.json();
       showErrorMessage(`❌ Échec de l'enregistrement automatique: ${errorData.message || 'Erreur serveur'}`);
+      updateStatus('❌ Erreur lors du pointage. Relancez le scanner si nécessaire.', 'error');
     }
   } catch (error) {
     console.error('Erreur création timesheet:', error);
