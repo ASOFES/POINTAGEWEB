@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimeSheet Tecno</title>
+  
+  <style>
+    /* CSS minimal pour Tecno HiOS */
+    body {
+      font-family: Arial;
+      background: #4169E1;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .app {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: #4169E1;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      background: #4169E1;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .info { background: #cce7ff; color: #004085; }
+    .hidden { display: none; }
+
+    .log {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: black;
+      color: lime;
+      padding: 5px;
+      font-size: 10px;
+      max-height: 60px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="logDiv" class="log">TECNO: Initialisation...</div>
+
+  <div class="app">
+    <!-- Login -->
+    <div id="loginPage">
+      <div class="header">
+        <h2>🔐 TimeSheet Login</h2>
+        <small>Tecno HiOS Optimized</small>
+      </div>
+      
+      <div id="loginMsg" class="status info">Connectez-vous</div>
+      
+      <input type="email" id="email" class="input" placeholder="Email" value="admin@asofes.cd">
+      <input type="password" id="password" class="input" placeholder="Mot de passe" value="admin123">
+      <button onclick="login()" class="btn">🚀 CONNEXION</button>
+    </div>
+
+    <!-- App -->
+    <div id="appPage" class="hidden">
+      <div class="header">
+        <h2>⏰ TimeSheet</h2>
+        <div style="font-size: 12px;">
+          <span id="userName">Utilisateur</span>
+          <button onclick="logout()" style="float: right; background: rgba(255,255,255,0.3); border: none; color: white; padding: 5px; border-radius: 3px; font-size: 10px;">SORTIR</button>
+        </div>
+      </div>
+
+      <button onclick="showSection('pointage')" class="btn">✏️ FAIRE POINTAGE</button>
+      <button onclick="showSection('history')" class="btn">📋 VOIR HISTORIQUE</button>
+
+      <!-- Pointage Section -->
+      <div id="pointageSection" class="hidden">
+        <h3>✏️ Pointage Manuel</h3>
+        <div id="pointageMsg" class="status info">Saisissez le code QR</div>
+        <input type="text" id="qrInput" class="input" placeholder="Code QR (ex: 1|2|3)">
+        <button onclick="doPointage()" class="btn">✅ VALIDER</button>
+        <button onclick="showSection('main')" class="btn" style="background: #666;">🔙 RETOUR</button>
+      </div>
+
+      <!-- History Section -->
+      <div id="historySection" class="hidden">
+        <h3>📋 Historique</h3>
+        <button onclick="loadHistory()" class="btn">🔄 ACTUALISER</button>
+        <button onclick="showSection('main')" class="btn" style="background: #666;">🔙 RETOUR</button>
+        <div id="historyList">
+          <div style="text-align: center; padding: 20px; color: #666;">
+            Cliquez sur ACTUALISER
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables
+    var user = null;
+    var token = null;
+    var API_BASE = 'https://timesheetapp.azurewebsites.net/api';
+
+    // Logging simple
+    function log(msg) {
+      console.log(msg);
+      var logEl = document.getElementById('logDiv');
+      if (logEl) {
+        logEl.innerHTML = new Date().toLocaleTimeString() + ': ' + msg;
+      }
+    }
+
+    // HTTP Request compatible Tecno
+    function httpRequest(method, url, data, callback) {
+      log('HTTP ' + method + ' to ' + url.split('/').pop());
+      
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      if (token) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      }
+      
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          var success = xhr.status >= 200 && xhr.status < 300;
+          var responseData = null;
+          
+          try {
+            if (xhr.responseText) {
+              responseData = JSON.parse(xhr.responseText);
+            }
+          } catch (e) {
+            log('JSON parse error');
+          }
+          
+          callback(success, responseData, xhr.status);
+        }
+      };
+      
+      xhr.onerror = function() {
+        log('Network error');
+        callback(false, null, 0);
+      };
+      
+      if (data) {
+        xhr.send(JSON.stringify(data));
+      } else {
+        xhr.send();
+      }
+    }
+
+    // Login
+    function login() {
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+      var msgEl = document.getElementById('loginMsg');
+      
+      if (!email || !password) {
+        msgEl.innerHTML = '❌ Remplissez tous les champs';
+        msgEl.className = 'status error';
+        return;
+      }
+      
+      log('Login attempt: ' + email);
+      msgEl.innerHTML = '⏳ Connexion...';
+      msgEl.className = 'status info';
+      
+      httpRequest('POST', API_BASE + '/auth/login', {
+        email: email,
+        password: password
+      }, function(success, data, status) {
+        if (success && data && data.token) {
+          log('Login success: ' + data.user.displayName);
+          token = data.token;
+          user = data.user;
+          
+          // Save to localStorage
+          try {
+            localStorage.setItem('tecno_token', token);
+            localStorage.setItem('tecno_user', JSON.stringify(user));
+          } catch (e) {
+            log('Storage save failed');
+          }
+          
+          msgEl.innerHTML = '✅ Connexion réussie !';
+          msgEl.className = 'status success';
+          
+          setTimeout(showApp, 1000);
+        } else {
+          var errorMsg = data && data.message ? data.message : 'Erreur de connexion';
+          log('Login failed: ' + errorMsg);
+          msgEl.innerHTML = '❌ ' + errorMsg;
+          msgEl.className = 'status error';
+        }
+      });
+    }
+
+    // Show app
+    function showApp() {
+      document.getElementById('loginPage').className = 'hidden';
+      document.getElementById('appPage').className = '';
+      document.getElementById('userName').innerHTML = user.displayName || 'User';
+      showSection('main');
+      log('App loaded');
+    }
+
+    // Navigation
+    function showSection(section) {
+      log('Show section: ' + section);
+      
+      // Hide all sections
+      document.getElementById('pointageSection').className = 'hidden';
+      document.getElementById('historySection').className = 'hidden';
+      
+      if (section === 'pointage') {
+        document.getElementById('pointageSection').className = '';
+      } else if (section === 'history') {
+        document.getElementById('historySection').className = '';
+      }
+      // 'main' shows the main buttons (both sections hidden)
+    }
+
+    // Pointage
+    function doPointage() {
+      var qrCode = document.getElementById('qrInput').value.trim();
+      var msgEl = document.getElementById('pointageMsg');
+      
+      if (!qrCode) {
+        msgEl.innerHTML = '❌ Saisissez un code QR';
+        msgEl.className = 'status error';
+        return;
+      }
+      
+      log('Pointage: ' + qrCode);
+      msgEl.innerHTML = '⏳ Traitement...';
+      msgEl.className = 'status info';
+      
+      try {
+        var parts = qrCode.split('|');
+        if (parts.length < 3) {
+          throw new Error('Format invalide');
+        }
+        
+        var payload = {
+          site_id: parseInt(parts[0]),
+          planning_id: parseInt(parts[1]),
+          timesheet_type_id: parseInt(parts[2]),
+          unique_code: 'TECNO-' + Date.now(),
+          details: JSON.stringify({
+            uid: user.id,
+            un: user.displayName,
+            pid: parseInt(parts[1]),
+            ts: Date.now(),
+            lat: 0.0,
+            lng: 0.0,
+            device: 'Tecno_Ultra'
+          })
+        };
+        
+        httpRequest('POST', API_BASE + '/timesheets', payload, function(success, data, status) {
+          if (success && data) {
+            log('Pointage success: ' + data.id);
+            msgEl.innerHTML = '✅ Pointage enregistré !';
+            msgEl.className = 'status success';
+            document.getElementById('qrInput').value = '';
+          } else {
+            var errorMsg = data && data.message ? data.message : 'Erreur pointage';
+            log('Pointage failed: ' + errorMsg);
+            msgEl.innerHTML = '❌ ' + errorMsg;
+            msgEl.className = 'status error';
+          }
+        });
+        
+      } catch (error) {
+        log('Pointage error: ' + error.message);
+        msgEl.innerHTML = '❌ ' + error.message;
+        msgEl.className = 'status error';
+      }
+    }
+
+    // Load history
+    function loadHistory() {
+      log('Loading history...');
+      var listEl = document.getElementById('historyList');
+      
+      listEl.innerHTML = '<div style="text-align: center;">⏳ Chargement...</div>';
+      
+      httpRequest('GET', API_BASE + '/timesheets/user/' + user.id, null, function(success, data, status) {
+        if (success && data) {
+          log('History loaded: ' + data.length + ' items');
+          
+          if (data.length === 0) {
+            listEl.innerHTML = '<div style="text-align: center; color: #666;">Aucun pointage</div>';
+          } else {
+            var html = '';
+            for (var i = 0; i < Math.min(data.length, 3); i++) {
+              var item = data[i];
+              var date = new Date(item.created_at).toLocaleDateString();
+              html += '<div style="border: 1px solid #ddd; margin: 5px 0; padding: 8px; border-radius: 4px; font-size: 12px;">';
+              html += '<strong>📅 ' + date + '</strong><br>';
+              html += '🏷️ ' + (item.unique_code || 'N/A') + '<br>';
+              html += '⏰ Type: ' + (item.timesheet_type_id || 'N/A');
+              html += '</div>';
+            }
+            listEl.innerHTML = html;
+          }
+        } else {
+          listEl.innerHTML = '<div style="text-align: center; color: red;">❌ Erreur chargement</div>';
+        }
+      });
+    }
+
+    // Logout
+    function logout() {
+      log('Logout');
+      user = null;
+      token = null;
+      
+      try {
+        localStorage.removeItem('tecno_token');
+        localStorage.removeItem('tecno_user');
+      } catch (e) {
+        log('Storage clear failed');
+      }
+      
+      document.getElementById('appPage').className = 'hidden';
+      document.getElementById('loginPage').className = '';
+      
+      document.getElementById('loginMsg').innerHTML = 'Connectez-vous';
+      document.getElementById('loginMsg').className = 'status info';
+    }
+
+    // Initialize
+    function init() {
+      log('TECNO ULTRA v1.0 - Init');
+      log('UA: ' + navigator.userAgent.substring(0, 20) + '...');
+      
+      // Check saved login
+      try {
+        var savedToken = localStorage.getItem('tecno_token');
+        var savedUser = localStorage.getItem('tecno_user');
+        
+        if (savedToken && savedUser) {
+          log('Saved login found');
+          token = savedToken;
+          user = JSON.parse(savedUser);
+          showApp();
+          return;
+        }
+      } catch (e) {
+        log('No saved login');
+      }
+      
+      log('Show login page');
+    }
+
+    // Start
+    window.onload = init;
+    
+    // Error handling
+    window.onerror = function(msg) {
+      log('JS Error: ' + msg);
+      return false;
+    };
+  </script>
+</body>
+</html>
