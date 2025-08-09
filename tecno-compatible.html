@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>TimeSheet - Tecno Compatible</title>
+  
+  <style>
+    /* CSS ultra-basique pour WebView Tecno HiOS */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #4169E1;
+      margin: 0;
+      padding: 5px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 100%;
+      background-color: white;
+      margin: 5px auto;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .header {
+      background-color: #4169E1;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .button {
+      display: block;
+      width: 95%;
+      padding: 12px;
+      margin: 8px auto;
+      background-color: #4169E1;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:active {
+      background-color: #2E4BC6;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .input-group input {
+      width: 95%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .status-box {
+      padding: 8px;
+      margin: 8px 0;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .status-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .status-error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .status-info {
+      background-color: #cce7ff;
+      color: #004085;
+    }
+
+    .debug-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: black;
+      color: lime;
+      padding: 8px;
+      font-size: 10px;
+      font-family: monospace;
+      max-height: 80px;
+      overflow-y: auto;
+      border-top: 2px solid lime;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .tab-buttons {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #4169E1;
+      background-color: white;
+      color: #4169E1;
+      text-align: center;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background-color: #4169E1;
+      color: white;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- Debug Panel pour Tecno -->
+  <div id="debugPanel" class="debug-panel">
+    🔍 Initialisation Tecno HiOS...
+  </div>
+
+  <div class="container">
+    <!-- Login Section -->
+    <div id="loginSection">
+      <div class="header">
+        <h1>🔐 TimeSheet Login</h1>
+        <div style="font-size: 10px; margin-top: 3px;">Version Tecno HiOS Compatible</div>
+      </div>
+      
+      <div id="loginStatus" class="status-box status-info">
+        Entrez vos identifiants de connexion
+      </div>
+
+      <form id="loginForm">
+        <div class="input-group">
+          <label>📧 Email:</label>
+          <input type="text" id="emailInput" value="admin@asofes.cd">
+        </div>
+        
+        <div class="input-group">
+          <label>🔒 Mot de passe:</label>
+          <input type="password" id="passwordInput" value="admin123">
+        </div>
+        
+        <button type="submit" class="button">🚀 SE CONNECTER</button>
+      </form>
+    </div>
+
+    <!-- App Section -->
+    <div id="appSection" class="hidden">
+      <div class="header">
+        <h1>⏰ TimeSheet App</h1>
+        <div style="font-size: 11px;">
+          <span id="userInfo">Utilisateur connecté</span>
+          <button onclick="doLogout()" style="float: right; background: rgba(255,255,255,0.3); border: none; color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px;">SORTIR</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-buttons">
+        <div class="tab-button active" onclick="showTab('home')">🏠 ACCUEIL</div>
+        <div class="tab-button" onclick="showTab('scan')">✏️ POINTER</div>
+        <div class="tab-button" onclick="showTab('list')">📋 LISTE</div>
+      </div>
+
+      <!-- Home Tab -->
+      <div id="homeTab" class="section active">
+        <div class="status-box status-info">
+          🏠 Bienvenue dans TimeSheet
+        </div>
+        <button class="button" onclick="showTab('scan')">✏️ FAIRE UN POINTAGE</button>
+        <button class="button" onclick="showTab('list')">📋 VOIR LA LISTE</button>
+      </div>
+
+      <!-- Scan Tab -->
+      <div id="scanTab" class="section">
+        <div class="status-box status-info">
+          ✏️ Saisissez le code QR manuellement
+        </div>
+        
+        <div class="input-group">
+          <label>🎯 Code QR (format: 1|2|3):</label>
+          <input type="text" id="qrCodeInput" placeholder="Exemple: 1|2|3">
+        </div>
+        
+        <button class="button" onclick="doPointage()">✅ VALIDER POINTAGE</button>
+        
+        <div id="pointageStatus" class="status-box status-info hidden">
+          Prêt pour pointage
+        </div>
+      </div>
+
+      <!-- List Tab -->
+      <div id="listTab" class="section">
+        <div class="status-box status-info">
+          📋 Historique des pointages
+        </div>
+        <button class="button" onclick="loadPointages()">🔄 ACTUALISER</button>
+        <div id="pointagesList">
+          <div style="text-align: center; padding: 15px; color: #666;">
+            Cliquez sur ACTUALISER pour voir la liste
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales
+    var currentUser = null;
+    var currentToken = null;
+    
+    // Fonction debug pour Tecno
+    function log(message) {
+      console.log(message);
+      var panel = document.getElementById('debugPanel');
+      if (panel) {
+        var time = new Date().toLocaleTimeString();
+        panel.innerHTML = time + ': ' + message + '<br>' + panel.innerHTML;
+        // Limiter à 3 lignes pour économiser l'espace
+        var lines = panel.innerHTML.split('<br>');
+        if (lines.length > 4) {
+          panel.innerHTML = lines.slice(0, 4).join('<br>');
+        }
+      }
+    }
+
+    // XMLHttpRequest au lieu de fetch pour compatibilité Tecno
+    function makeRequest(method, url, data, callback) {
+      log('📡 ' + method + ' vers ' + url.substring(0, 30) + '...');
+      
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, url, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      if (currentToken) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + currentToken);
+      }
+      
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          log('📡 Réponse: ' + xhr.status);
+          var response = {
+            ok: xhr.status >= 200 && xhr.status < 300,
+            status: xhr.status,
+            data: null
+          };
+          
+          try {
+            if (xhr.responseText) {
+              response.data = JSON.parse(xhr.responseText);
+            }
+          } catch (e) {
+            log('❌ JSON parse error');
+          }
+          
+          callback(response);
+        }
+      };
+      
+      xhr.onerror = function() {
+        log('❌ Erreur réseau');
+        callback({ ok: false, status: 0, data: null });
+      };
+      
+      if (data) {
+        xhr.send(JSON.stringify(data));
+      } else {
+        xhr.send();
+      }
+    }
+
+    // Initialisation
+    function init() {
+      log('✅ Init Tecno HiOS');
+      log('📱 UA: ' + navigator.userAgent.substring(0, 25) + '...');
+      
+      // Vérifier token sauvegardé
+      try {
+        var token = localStorage.getItem('token_tecno');
+        var user = localStorage.getItem('user_tecno');
+        
+        if (token && user) {
+          log('🔑 Token trouvé');
+          currentToken = token;
+          currentUser = JSON.parse(user);
+          showApp();
+        }
+      } catch (e) {
+        log('⚠️ Pas de token sauvé');
+      }
+    }
+
+    // Gestion login
+    function handleLogin() {
+      var email = document.getElementById('emailInput').value;
+      var password = document.getElementById('passwordInput').value;
+      var statusEl = document.getElementById('loginStatus');
+      
+      if (!email || !password) {
+        statusEl.innerHTML = '❌ Veuillez remplir tous les champs';
+        statusEl.className = 'status-box status-error';
+        return false;
+      }
+      
+      log('🚀 Tentative login: ' + email);
+      statusEl.innerHTML = '⏳ Connexion en cours...';
+      statusEl.className = 'status-box status-info';
+      
+      makeRequest('POST', 'https://timesheetapp.azurewebsites.net/api/auth/login', {
+        email: email,
+        password: password
+      }, function(response) {
+        if (response.ok && response.data) {
+          log('✅ Login OK: ' + response.data.user.displayName);
+          currentToken = response.data.token;
+          currentUser = response.data.user;
+          
+          // Sauvegarder
+          try {
+            localStorage.setItem('token_tecno', currentToken);
+            localStorage.setItem('user_tecno', JSON.stringify(currentUser));
+          } catch (e) {
+            log('⚠️ Sauvegarde impossible');
+          }
+          
+          statusEl.innerHTML = '✅ Connexion réussie !';
+          statusEl.className = 'status-box status-success';
+          
+          setTimeout(showApp, 1500);
+        } else {
+          var errorMsg = response.data ? response.data.message : 'Erreur de connexion';
+          log('❌ Login failed: ' + errorMsg);
+          statusEl.innerHTML = '❌ ' + errorMsg;
+          statusEl.className = 'status-box status-error';
+        }
+      });
+      
+      return false;
+    }
+
+    // Afficher l'app
+    function showApp() {
+      document.getElementById('loginSection').className = 'hidden';
+      document.getElementById('appSection').className = '';
+      document.getElementById('userInfo').innerHTML = currentUser.displayName || 'Utilisateur';
+      log('🏠 App affichée');
+    }
+
+    // Navigation tabs
+    function showTab(tabName) {
+      log('📱 Tab: ' + tabName);
+      
+      // Cacher toutes les sections
+      var sections = document.getElementsByClassName('section');
+      for (var i = 0; i < sections.length; i++) {
+        sections[i].className = 'section';
+      }
+      
+      // Désactiver tous les boutons
+      var buttons = document.getElementsByClassName('tab-button');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].className = 'tab-button';
+      }
+      
+      // Afficher la section
+      var targetSection = document.getElementById(tabName + 'Tab');
+      if (targetSection) {
+        targetSection.className = 'section active';
+      }
+      
+      // Activer le bon bouton
+      var targetButton = buttons[tabName === 'home' ? 0 : (tabName === 'scan' ? 1 : 2)];
+      if (targetButton) {
+        targetButton.className = 'tab-button active';
+      }
+    }
+
+    // Faire un pointage
+    function doPointage() {
+      var qrCode = document.getElementById('qrCodeInput').value.trim();
+      var statusEl = document.getElementById('pointageStatus');
+      
+      if (!qrCode) {
+        statusEl.innerHTML = '❌ Veuillez saisir un code QR';
+        statusEl.className = 'status-box status-error';
+        statusEl.className = statusEl.className.replace('hidden', '');
+        return;
+      }
+      
+      log('🎯 Pointage: ' + qrCode);
+      statusEl.innerHTML = '⏳ Traitement...';
+      statusEl.className = 'status-box status-info';
+      statusEl.className = statusEl.className.replace('hidden', '');
+      
+      try {
+        var parts = qrCode.split('|');
+        if (parts.length < 3) {
+          throw new Error('Format invalide (attendu: site|planning|type)');
+        }
+        
+        var payload = {
+          site_id: parseInt(parts[0]),
+          planning_id: parseInt(parts[1]),
+          timesheet_type_id: parseInt(parts[2]),
+          unique_code: 'TECNO-' + Date.now(),
+          details: JSON.stringify({
+            uid: currentUser.id,
+            un: currentUser.displayName,
+            pid: parseInt(parts[1]),
+            ts: Date.now(),
+            lat: 0.0,
+            lng: 0.0,
+            device: 'Tecno_HiOS'
+          })
+        };
+        
+        makeRequest('POST', 'https://timesheetapp.azurewebsites.net/api/timesheets', payload, function(response) {
+          if (response.ok && response.data) {
+            log('✅ Pointage OK: ' + response.data.id);
+            statusEl.innerHTML = '✅ Pointage enregistré !';
+            statusEl.className = 'status-box status-success';
+            document.getElementById('qrCodeInput').value = '';
+          } else {
+            var errorMsg = response.data ? response.data.message : 'Erreur pointage';
+            log('❌ Pointage failed: ' + errorMsg);
+            statusEl.innerHTML = '❌ ' + errorMsg;
+            statusEl.className = 'status-box status-error';
+          }
+        });
+        
+      } catch (error) {
+        log('❌ Erreur: ' + error.message);
+        statusEl.innerHTML = '❌ ' + error.message;
+        statusEl.className = 'status-box status-error';
+      }
+    }
+
+    // Charger la liste
+    function loadPointages() {
+      log('📋 Chargement liste...');
+      var listEl = document.getElementById('pointagesList');
+      
+      listEl.innerHTML = '<div style="text-align: center;">⏳ Chargement...</div>';
+      
+      makeRequest('GET', 'https://timesheetapp.azurewebsites.net/api/timesheets/user/' + currentUser.id, null, function(response) {
+        if (response.ok && response.data) {
+          log('📋 ' + response.data.length + ' pointages');
+          
+          if (response.data.length === 0) {
+            listEl.innerHTML = '<div style="text-align: center; color: #666;">Aucun pointage</div>';
+          } else {
+            var html = '';
+            for (var i = 0; i < Math.min(response.data.length, 5); i++) {
+              var item = response.data[i];
+              var date = new Date(item.created_at).toLocaleString('fr-FR');
+              html += '<div style="border: 1px solid #ddd; margin: 4px 0; padding: 6px; border-radius: 3px; font-size: 11px;">';
+              html += '<strong>📅 ' + date + '</strong><br>';
+              html += '🏷️ ' + (item.unique_code || 'N/A') + '<br>';
+              html += '⏰ Type: ' + (item.timesheet_type_id || 'N/A');
+              html += '</div>';
+            }
+            listEl.innerHTML = html;
+          }
+        } else {
+          listEl.innerHTML = '<div style="text-align: center; color: red;">❌ Erreur chargement</div>';
+        }
+      });
+    }
+
+    // Déconnexion
+    function doLogout() {
+      log('🚪 Logout');
+      currentUser = null;
+      currentToken = null;
+      
+      try {
+        localStorage.removeItem('token_tecno');
+        localStorage.removeItem('user_tecno');
+      } catch (e) {
+        log('⚠️ Erreur suppression token');
+      }
+      
+      document.getElementById('appSection').className = 'hidden';
+      document.getElementById('loginSection').className = '';
+      
+      document.getElementById('loginStatus').innerHTML = 'Entrez vos identifiants de connexion';
+      document.getElementById('loginStatus').className = 'status-box status-info';
+    }
+
+    // Event listeners (compatible IE/ancien WebView)
+    window.onload = function() {
+      init();
+      
+      // Form submit
+      document.getElementById('loginForm').onsubmit = function(e) {
+        if (e.preventDefault) e.preventDefault();
+        handleLogin();
+        return false;
+      };
+    };
+
+    // Gestion erreurs
+    window.onerror = function(msg, url, line) {
+      log('❌ JS Error: ' + msg);
+      return false;
+    };
+  </script>
+</body>
+</html>
