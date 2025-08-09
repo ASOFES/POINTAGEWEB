@@ -4,6 +4,9 @@ let isScanning = false;
 let authManager = new AuthManager();
 let currentSection = 'dashboard';
 let timesheetHistory = [];
+let isProcessing = false;
+let lastScannedQR = '';
+let lastScanTime = 0;
 
 // Initialisation de la page
 window.addEventListener('load', async function() {
@@ -218,6 +221,24 @@ function stopScanner() {
 function onScanSuccess(decodedText, decodedResult) {
   console.log('QR Code détecté:', decodedText);
   
+  const currentTime = Date.now();
+  
+  // Éviter les scans multiples du même QR en quelques secondes
+  if (isProcessing) {
+    console.log('⏳ Traitement en cours, scan ignoré');
+    return;
+  }
+  
+  if (lastScannedQR === decodedText && (currentTime - lastScanTime) < 3000) {
+    console.log('🔄 Même QR scanné récemment, scan ignoré');
+    return;
+  }
+  
+  // Marquer comme en traitement
+  isProcessing = true;
+  lastScannedQR = decodedText;
+  lastScanTime = currentTime;
+  
   showScanIndicator('Validation du pointage...');
   
   // Traiter le QR code
@@ -347,6 +368,8 @@ async function processQRCode(qrData) {
     showErrorMessage('Erreur lors du traitement du QR code');
   } finally {
     hideScanIndicator();
+    // Remettre le flag de traitement à false
+    isProcessing = false;
   }
 }
 
@@ -403,6 +426,9 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
   } catch (error) {
     console.error('Erreur création timesheet:', error);
     showErrorMessage(`Erreur: ${error.message}`);
+  } finally {
+    // S'assurer que le flag de traitement est remis à false
+    isProcessing = false;
   }
 }
 
