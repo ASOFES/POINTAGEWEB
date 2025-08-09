@@ -1,18 +1,28 @@
 [build]
   publish = "."
-  command = ""
+  
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  conditions = {Role = ["admin", "editor"]}
 
-[build.environment]
-  NODE_VERSION = "18"
+# HTTPS redirect
+[[redirects]]
+  from = "http://timesheeet-qr.netlify.app/*"
+  to = "https://timesheeet-qr.netlify.app/:splat"
+  status = 301
+  force = true
 
+# Headers for security
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:"
