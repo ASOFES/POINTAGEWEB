@@ -405,6 +405,16 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
       return;
     }
 
+    // VÉRIFICATION ANTI-DOUBLON: Vérifier si ce QR a déjà été utilisé aujourd'hui
+    const alreadyUsedToday = await checkQRAlreadyUsedToday(qrData, user.id);
+    if (alreadyUsedToday) {
+      const siteName = qrData.split('|')[0] || 'Site inconnu';
+      showErrorMessage(`⚠️ Vous avez déjà pointé sur ce site aujourd'hui !`);
+      updateStatus(`❌ QR déjà utilisé aujourd'hui - Site: ${siteName}`, 'error');
+      console.log('🚫 DOUBLON DÉTECTÉ: QR déjà utilisé aujourd\'hui par cet utilisateur');
+      return;
+    }
+
     const uniqueCode = generateUniqueCode();
 
     // Créer des détails raccourcis pour respecter la limite de 256 caractères (comme l'APK)
@@ -459,6 +469,64 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
     isProcessing = false;
     scannerDisabled = false; // Réactiver le scanner pour le prochain scan
     console.log('🔓 DÉVERROUILLAGE: Scanner réactivé pour nouveau scan');
+  }
+}
+
+// Vérifier si un QR code a déjà été utilisé aujourd'hui par cet utilisateur
+async function checkQRAlreadyUsedToday(qrData, userId) {
+  try {
+    console.log('🔍 Vérification anti-doublon pour QR:', qrData);
+    
+    // Récupérer l'historique des pointages de l'utilisateur pour aujourd'hui
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+    
+    const token = authManager.getToken();
+    const response = await fetch(`https://timesheetapp.azurewebsites.net/api/timesheets/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.log('⚠️ Impossible de vérifier l\'historique - autorisation du scan');
+      return false; // En cas d'erreur, on autorise le scan
+    }
+
+    const timesheets = await response.json();
+    console.log('📋 Historique récupéré:', timesheets.length, 'pointages');
+
+    // Vérifier si un pointage avec le même QR existe aujourd'hui
+    const todayTimesheets = timesheets.filter(timesheet => {
+      const timesheetDate = new Date(timesheet.created_at);
+      return timesheetDate >= startOfDay && timesheetDate < endOfDay;
+    });
+
+    console.log('📅 Pointages aujourd\'hui:', todayTimesheets.length);
+
+    // Chercher si le même QR a été utilisé (comparer par site_id et planning_id)
+    const sameQRUsed = todayTimesheets.some(timesheet => {
+      // Comparer les IDs spécifiques du QR plutôt que le contenu brut
+      return timesheet.site_id === parseInt(qrData.split('|')[0]) && 
+             timesheet.planning_id === parseInt(qrData.split('|')[1]);
+    });
+
+    if (sameQRUsed) {
+      console.log('🚫 QR DÉJÀ UTILISÉ aujourd\'hui !');
+    } else {
+      console.log('✅ QR non utilisé aujourd\'hui - autorisation du scan');
+    }
+
+    return sameQRUsed;
+    
+  } catch (error) {
+    console.error('❌ Erreur vérification anti-doublon:', error);
+    // En cas d'erreur, on autorise le scan pour ne pas bloquer l'utilisateur
+    return false;
   }
 }
 
