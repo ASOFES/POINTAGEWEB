@@ -8,18 +8,36 @@
   
   <!-- Chargement de la bibliothèque QR scanner avec diagnostic mobile -->
   <script>
-    // Debug pour mobile - Affichage des erreurs à l'écran
+    // Debug pour mobile - Affichage conditionnel
     window.mobileDebug = {
       errors: [],
+      errorCount: 0,
       log: function(message) {
         console.log(message);
         this.errors.push(message);
-        this.updateDebugDisplay();
+        
+        // Compter les erreurs
+        if (message.includes('❌')) {
+          this.errorCount++;
+        }
+        
+        // Afficher seulement s'il y a des erreurs ou en mode debug
+        if (this.errorCount > 0 || window.location.hash === '#debug') {
+          this.updateDebugDisplay();
+        }
       },
       updateDebugDisplay: function() {
+        const debugContentEl = document.getElementById('debugContent');
+        const debugEl = document.getElementById('mobileDebug');
+        if (debugContentEl && debugEl) {
+          debugContentEl.innerHTML = this.errors.slice(-5).join('<br>');
+          debugEl.classList.add('show');
+        }
+      },
+      hide: function() {
         const debugEl = document.getElementById('mobileDebug');
         if (debugEl) {
-          debugEl.innerHTML = this.errors.slice(-5).join('<br>');
+          debugEl.classList.remove('show');
         }
       }
     };
@@ -559,7 +577,7 @@
       display: block;
     }
 
-    /* Element de debug mobile */
+    /* Element de debug mobile - MASQUÉ par défaut */
     #mobileDebug {
       position: fixed;
       bottom: 10px;
@@ -607,10 +625,8 @@
         white-space: nowrap;
       }
       
-      /* Afficher le debug sur mobile */
-      #mobileDebug {
-        display: block;
-      }
+      /* NE PAS afficher le debug sur mobile automatiquement */
+      /* #mobileDebug sera affiché seulement si nécessaire */
     }
   </style>
 </head>
@@ -634,7 +650,10 @@
     </div>
     
     <!-- Debug mobile pour diagnostiquer les problèmes -->
-    <div id="mobileDebug"></div>
+    <div id="mobileDebug">
+      <button onclick="mobileDebug.hide()" style="float: right; background: red; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;">✕</button>
+      <div id="debugContent"></div>
+    </div>
 
     <!-- Section utilisateur -->
     <div class="user-header">
