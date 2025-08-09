@@ -162,45 +162,7 @@
       margin-bottom: 4px;
     }
 
-    .main-actions {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-    }
 
-    .action-card {
-      background: white;
-      border: 2px solid #e0e0e0;
-      border-radius: 15px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .action-card:hover {
-      border-color: #1976D2;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(25, 118, 210, 0.2);
-    }
-
-    .action-icon {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-
-    .action-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .action-subtitle {
-      font-size: 12px;
-      color: #666;
-    }
 
     .scanner-section {
       padding: 30px;
@@ -487,14 +449,7 @@
         max-width: calc(100vw - 20px);
       }
       
-      .main-actions {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-      
-      .action-card {
-        padding: 15px;
-      }
+
       
       .btn {
         padding: 10px 20px;
@@ -554,30 +509,10 @@
 
     <!-- Section Tableau de bord -->
     <div id="dashboard-section" class="dashboard-section active">
-      <div class="main-actions">
-        <div class="action-card" onclick="showSection('scanner')">
-          <div class="action-icon">📷</div>
-          <div class="action-title">Scanner QR</div>
-          <div class="action-subtitle">Pointer votre entrée/sortie</div>
-        </div>
-        
-        <div class="action-card" onclick="showSection('history')">
-          <div class="action-icon">📊</div>
-          <div class="action-title">Historique</div>
-          <div class="action-subtitle">Voir vos pointages</div>
-        </div>
-        
-        <div class="action-card" onclick="showSection('profile')">
-          <div class="action-icon">👤</div>
-          <div class="action-title">Profil</div>
-          <div class="action-subtitle">Informations personnelles</div>
-        </div>
-        
-        <div class="action-card" onclick="refreshData()">
-          <div class="action-icon">🔄</div>
-          <div class="action-title">Actualiser</div>
-          <div class="action-subtitle">Synchroniser les données</div>
-        </div>
+      <div style="padding: 20px; text-align: center;">
+        <h2 style="color: #1976D2; margin-bottom: 15px;">🏠 Bienvenue dans votre espace de pointage</h2>
+        <p style="color: #666; margin-bottom: 20px;">Utilisez la navigation ci-dessus pour accéder aux différentes fonctionnalités</p>
+        <button onclick="refreshData()" class="btn" style="margin: 10px;">🔄 Actualiser les données</button>
       </div>
 
       <!-- Pointages récents -->
