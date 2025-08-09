@@ -73,15 +73,27 @@ async function loadUserData() {
   try {
     const user = authManager.getUser();
     if (user) {
+      // Header utilisateur
       document.getElementById('userDisplay').textContent = user.username || user.name || 'Utilisateur';
       document.getElementById('userName').textContent = user.username || user.name || 'Utilisateur';
       document.getElementById('userRole').textContent = user.role || 'Employé';
       document.getElementById('userEmail').textContent = user.email || 'email@example.com';
       
-      // Avatar
+      // Avatar header
       const avatar = document.getElementById('userAvatar');
       const initials = (user.username || user.name || 'U').substring(0, 1).toUpperCase();
       avatar.textContent = initials;
+      
+      // Dashboard utilisateur (nouveaux éléments)
+      const userNameDash = document.getElementById('userNameDash');
+      const userRoleDash = document.getElementById('userRoleDash');
+      const userEmailDash = document.getElementById('userEmailDash');
+      const userAvatarDash = document.getElementById('userAvatarDash');
+      
+      if (userNameDash) userNameDash.textContent = user.username || user.name || 'Utilisateur';
+      if (userRoleDash) userRoleDash.textContent = user.role || 'Employé';
+      if (userEmailDash) userEmailDash.textContent = user.email || 'email@example.com';
+      if (userAvatarDash) userAvatarDash.textContent = initials;
       
       // Profil
       document.getElementById('profileName').textContent = user.username || user.name || '-';
