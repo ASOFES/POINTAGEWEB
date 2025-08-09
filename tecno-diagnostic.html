@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Tecno Diagnostic</title>
+  
+  <style>
+    body {
+      font-family: Arial;
+      background: red;
+      color: white;
+      margin: 0;
+      padding: 20px;
+      font-size: 14px;
+    }
+    
+    .test {
+      background: white;
+      color: black;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    
+    .success { background: green; color: white; }
+    .error { background: red; color: white; }
+    
+    button {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      background: blue;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔧 DIAGNOSTIC TECNO HiOS</h1>
+  
+  <div id="results">
+    <div class="test">⏳ Tests en cours...</div>
+  </div>
+  
+  <button onclick="runTests()">🔄 RELANCER TESTS</button>
+  <button onclick="testAPI()">🌐 TESTER API</button>
+  <button onclick="clearAll()">🗑️ VIDER CACHE</button>
+  
+  <div id="log" style="background: black; color: lime; padding: 10px; margin: 10px 0; border-radius: 5px; font-family: monospace; font-size: 12px;">
+    Logs apparaîtront ici...
+  </div>
+  
+  <script>
+    function log(msg) {
+      console.log(msg);
+      var logEl = document.getElementById('log');
+      if (logEl) {
+        var time = new Date().toLocaleTimeString();
+        logEl.innerHTML = time + ': ' + msg + '<br>' + logEl.innerHTML;
+        if (logEl.innerHTML.length > 2000) {
+          logEl.innerHTML = logEl.innerHTML.substring(0, 2000);
+        }
+      }
+    }
+    
+    function addResult(test, success, details) {
+      var resultsEl = document.getElementById('results');
+      var className = success ? 'test success' : 'test error';
+      var icon = success ? '✅' : '❌';
+      
+      var html = '<div class="' + className + '">';
+      html += '<strong>' + icon + ' ' + test + '</strong><br>';
+      html += details;
+      html += '</div>';
+      
+      resultsEl.innerHTML += html;
+    }
+    
+    function runTests() {
+      log('Démarrage tests diagnostic');
+      document.getElementById('results').innerHTML = '';
+      
+      // Test 1: JavaScript de base
+      try {
+        var testVar = 'test';
+        addResult('JavaScript Basic', true, 'Variables et fonctions OK');
+      } catch (e) {
+        addResult('JavaScript Basic', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 2: DOM
+      try {
+        var testEl = document.createElement('div');
+        testEl.innerHTML = 'test';
+        addResult('DOM Manipulation', true, 'createElement et innerHTML OK');
+      } catch (e) {
+        addResult('DOM Manipulation', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 3: LocalStorage
+      try {
+        localStorage.setItem('test', 'value');
+        var value = localStorage.getItem('test');
+        localStorage.removeItem('test');
+        addResult('LocalStorage', value === 'value', 'Lecture/Écriture: ' + (value === 'value' ? 'OK' : 'FAILED'));
+      } catch (e) {
+        addResult('LocalStorage', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 4: XMLHttpRequest
+      try {
+        var xhr = new XMLHttpRequest();
+        addResult('XMLHttpRequest', true, 'Objet créé OK');
+      } catch (e) {
+        addResult('XMLHttpRequest', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 5: JSON
+      try {
+        var obj = { test: 'value' };
+        var json = JSON.stringify(obj);
+        var parsed = JSON.parse(json);
+        addResult('JSON', parsed.test === 'value', 'Stringify/Parse: ' + (parsed.test === 'value' ? 'OK' : 'FAILED'));
+      } catch (e) {
+        addResult('JSON', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 6: Date
+      try {
+        var now = new Date();
+        var timestamp = now.getTime();
+        addResult('Date/Time', timestamp > 0, 'Timestamp: ' + timestamp);
+      } catch (e) {
+        addResult('Date/Time', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 7: User Agent
+      try {
+        var ua = navigator.userAgent;
+        var isTecno = ua.toLowerCase().indexOf('tecno') >= 0 || ua.toLowerCase().indexOf('hios') >= 0;
+        addResult('User Agent', true, 'Device: ' + (isTecno ? 'TECNO détecté' : 'Autre') + '<br>UA: ' + ua.substring(0, 100));
+      } catch (e) {
+        addResult('User Agent', false, 'Erreur: ' + e.message);
+      }
+      
+      // Test 8: Screen
+      try {
+        var screenInfo = screen.width + 'x' + screen.height;
+        addResult('Screen', true, 'Résolution: ' + screenInfo);
+      } catch (e) {
+        addResult('Screen', false, 'Erreur: ' + e.message);
+      }
+      
+      log('Tests terminés');
+    }
+    
+    function testAPI() {
+      log('Test connexion API...');
+      
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://timesheetapp.azurewebsites.net/api/auth/login', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            log('API Response: ' + xhr.status);
+            if (xhr.status === 400 || xhr.status === 401) {
+              addResult('API Connexion', true, 'Serveur accessible (Status: ' + xhr.status + ')');
+            } else if (xhr.status === 200) {
+              addResult('API Connexion', true, 'Connexion réussie (Status: ' + xhr.status + ')');
+            } else {
+              addResult('API Connexion', false, 'Status inattendu: ' + xhr.status);
+            }
+          }
+        };
+        
+        xhr.onerror = function() {
+          log('API Error: Network');
+          addResult('API Connexion', false, 'Erreur réseau - Pas d\'accès internet ou firewall');
+        };
+        
+        xhr.send(JSON.stringify({
+          email: 'test@test.com',
+          password: 'test'
+        }));
+        
+      } catch (e) {
+        log('API Error: ' + e.message);
+        addResult('API Connexion', false, 'Erreur: ' + e.message);
+      }
+    }
+    
+    function clearAll() {
+      log('Nettoyage complet...');
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        addResult('Cache Clear', true, 'LocalStorage et SessionStorage vidés');
+      } catch (e) {
+        addResult('Cache Clear', false, 'Erreur: ' + e.message);
+      }
+    }
+    
+    // Auto-run tests on load
+    window.onload = function() {
+      log('=== DIAGNOSTIC TECNO HiOS DÉMARRÉ ===');
+      setTimeout(runTests, 500);
+    };
+    
+    window.onerror = function(msg, url, line) {
+      log('ERREUR JS: ' + msg + ' (ligne ' + line + ')');
+      addResult('Erreur JavaScript', false, msg + ' à la ligne ' + line);
+      return false;
+    };
+  </script>
+</body>
+</html>

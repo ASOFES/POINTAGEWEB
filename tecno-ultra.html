@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>TimeSheet Tecno</title>
   
   <style>
@@ -90,7 +93,10 @@
     <div id="loginPage">
       <div class="header">
         <h2>🔐 TimeSheet Login</h2>
-        <small>Tecno HiOS Optimized</small>
+        <small>Tecno HiOS v1.1</small>
+        <div style="margin-top: 5px;">
+          <button onclick="forceRefresh()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px;">🔄 REFRESH</button>
+        </div>
       </div>
       
       <div id="loginMsg" class="status info">Connectez-vous</div>
@@ -373,10 +379,45 @@
       document.getElementById('loginMsg').className = 'status info';
     }
 
-    // Initialize
+    // Force refresh pour Tecno
+    function forceRefresh() {
+      log('Force refresh requested');
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch (e) {
+        log('Clear storage failed');
+      }
+      
+      // Ajouter timestamp pour éviter cache
+      var newUrl = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
+      log('Redirecting to: ' + newUrl);
+      window.location.href = newUrl;
+    }
+
+    // Initialize avec gestion refresh Tecno
     function init() {
-      log('TECNO ULTRA v1.0 - Init');
+      var timestamp = new Date().getTime();
+      log('TECNO ULTRA v1.1 - Init ' + timestamp);
       log('UA: ' + navigator.userAgent.substring(0, 20) + '...');
+      
+      // Forcer refresh pour Tecno (éviter cache)
+      if (window.performance && window.performance.navigation.type === 1) {
+        log('Page refreshed - clearing cache');
+        try {
+          localStorage.removeItem('tecno_cache');
+          sessionStorage.clear();
+        } catch (e) {
+          log('Cache clear failed');
+        }
+      }
+      
+      // Marquer la page comme chargée
+      try {
+        localStorage.setItem('tecno_cache', timestamp.toString());
+      } catch (e) {
+        log('Cache mark failed');
+      }
       
       // Check saved login
       try {
