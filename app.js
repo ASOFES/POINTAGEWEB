@@ -7,6 +7,7 @@ let timesheetHistory = [];
 let isProcessing = false;
 let lastScannedQR = '';
 let lastScanTime = 0;
+let scannerDisabled = false; // Protection supplémentaire: désactivation complète
 
 // Initialisation de la page
 window.addEventListener('load', async function() {
@@ -162,6 +163,13 @@ function startScanner() {
     updateStatus('❌ Bibliothèque QR scanner non chargée', 'error');
     return;
   }
+  
+  // RÉINITIALISATION COMPLÈTE: Tous les verrous supprimés pour nouveau scan
+  isProcessing = false;
+  scannerDisabled = false;
+  lastScannedQR = null;
+  lastScanTime = 0;
+  console.log('🔄 RÉINITIALISATION TOTALE: Prêt pour nouveau scan unique');
 
   const startButton = document.getElementById('startScanButton');
   const stopButton = document.getElementById('stopScanButton');
@@ -221,27 +229,37 @@ function stopScanner() {
 function onScanSuccess(decodedText, decodedResult) {
   console.log('QR Code détecté:', decodedText);
   
+  // PROTECTION IMMÉDIATE: Si scanner désactivé = STOP TOTAL
+  if (scannerDisabled) {
+    console.log('🚫 SCANNER DÉSACTIVÉ: Scan bloqué complètement');
+    return;
+  }
+  
   const currentTime = Date.now();
   
-  // Éviter les scans multiples du même QR en quelques secondes
+  // PROTECTION RENFORCÉE: Bloquer immédiatement si traitement en cours
   if (isProcessing) {
-    console.log('⏳ Traitement en cours, scan ignoré');
+    console.log('⏳ BLOQUÉ: Traitement en cours, scan ignoré');
     return;
   }
   
-  if (lastScannedQR === decodedText && (currentTime - lastScanTime) < 3000) {
-    console.log('🔄 Même QR scanné récemment, scan ignoré');
+  // PROTECTION ANTI-DOUBLON: Même QR dans les 500ms = ignoré (réduit de 1000ms)
+  if (lastScannedQR === decodedText && (currentTime - lastScanTime) < 500) {
+    console.log('🔄 BLOQUÉ: Même QR scanné récemment, scan ignoré');
     return;
   }
+  
+  // VERROUILLAGE TOTAL IMMÉDIAT
+  isProcessing = true;
+  scannerDisabled = true; // Désactiver complètement le scanner
+  lastScannedQR = decodedText;
+  lastScanTime = currentTime;
+  
+  console.log('🔒 VERROUILLAGE TOTAL: Scanner complètement désactivé');
   
   // Arrêter le scanner immédiatement après détection
   console.log('📷 Arrêt automatique du scanner après détection');
   stopScanner();
-  
-  // Marquer comme en traitement
-  isProcessing = true;
-  lastScannedQR = decodedText;
-  lastScanTime = currentTime;
   
   showScanIndicator('Validation du pointage...');
   
@@ -372,8 +390,10 @@ async function processQRCode(qrData) {
     showErrorMessage('Erreur lors du traitement du QR code');
   } finally {
     hideScanIndicator();
-    // Remettre le flag de traitement à false
+    // Remettre TOUS les flags de traitement à false
     isProcessing = false;
+    scannerDisabled = false; // Réactiver le scanner pour le prochain scan
+    console.log('🔓 DÉVERROUILLAGE: Scanner réactivé pour nouveau scan');
   }
 }
 
@@ -435,8 +455,10 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
     console.error('Erreur création timesheet:', error);
     showErrorMessage(`Erreur: ${error.message}`);
   } finally {
-    // S'assurer que le flag de traitement est remis à false
+    // S'assurer que TOUS les flags de traitement sont remis à false
     isProcessing = false;
+    scannerDisabled = false; // Réactiver le scanner pour le prochain scan
+    console.log('🔓 DÉVERROUILLAGE: Scanner réactivé pour nouveau scan');
   }
 }
 
