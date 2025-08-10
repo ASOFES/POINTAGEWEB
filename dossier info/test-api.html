@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API TimeSheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #1976D2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1565C0;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test API TimeSheet</h1>
+    
+    <div class="test-section">
+        <h3>🔐 Test de Connexion</h3>
+        <button onclick="testLogin()">Tester la connexion</button>
+        <div id="loginResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>👤 Test Utilisateur</h3>
+        <button onclick="testUser()">Tester récupération utilisateur</button>
+        <div id="userResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Test Historique</h3>
+        <button onclick="testHistory()">Tester récupération historique</button>
+        <div id="historyResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'https://timesheetapp.azurewebsites.net/api';
+        let authToken = null;
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.textContent = '🔄 Test en cours...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'Test@test.com',
+                        password: 'test123'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    resultDiv.textContent = `✅ Connexion réussie!\nToken: ${data.token ? 'Reçu' : 'Manquant'}\nUser: ${JSON.stringify(data.user || 'Non fourni', null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Erreur de connexion (${response.status}):\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erreur réseau: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testUser() {
+            const resultDiv = document.getElementById('userResult');
+            resultDiv.textContent = '🔄 Test en cours...';
+            resultDiv.className = 'result';
+
+            if (!authToken) {
+                resultDiv.textContent = '❌ Token d\'authentification manquant. Testez d\'abord la connexion.';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Auth/users/1`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Utilisateurs récupérés:\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Erreur récupération utilisateurs (${response.status}):\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erreur réseau: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testHistory() {
+            const resultDiv = document.getElementById('historyResult');
+            resultDiv.textContent = '🔄 Test en cours...';
+            resultDiv.className = 'result';
+
+            if (!authToken) {
+                resultDiv.textContent = '❌ Token d\'authentification manquant. Testez d\'abord la connexion.';
+                resultDiv.className = 'result error';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/Timesheet/DailyResume/UserId/1`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Historique récupéré:\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `❌ Erreur récupération historique (${response.status}):\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Erreur réseau: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

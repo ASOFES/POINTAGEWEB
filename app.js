@@ -499,13 +499,13 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
         })();
 
         const legacyPayload = {
-            employeeId: currentUser?.id,
-            siteId: siteId,
-            planningId: planningId,
-            timesheetTypeId: timesheetTypeId,
-            start: new Date().toISOString(),
+            EmployeeId: currentUser?.id,
+            SiteId: siteId,
+            PlanningId: planningId,
+            TimesheetTypeId: timesheetTypeId,
+            Start: new Date().toISOString(),
             Code: uniqueCode,
-            details: legacyDetails
+            Details: legacyDetails
         };
         
         console.log('📤 Préparation envoi timesheet (formats APK + Legacy)');
@@ -527,11 +527,30 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
 
         for (let i = 0; i < attempts.length; i++) {
             const { url, payload, label } = attempts[i];
-            console.log(`📤 Tentative #${i + 1} (${label}) vers ${url} avec payload:`, payload);
+            const isLegacy = label.startsWith('Legacy');
+
+            // Préparer en-têtes et corps selon endpoint
+            const perAttemptHeaders = { ...headers };
+            let body;
+            if (isLegacy) {
+                // L'API legacy attend souvent du x-www-form-urlencoded
+                perAttemptHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
+                const usp = new URLSearchParams();
+                Object.entries(payload).forEach(([k, v]) => {
+                    if (v !== undefined && v !== null) usp.append(k, String(v));
+                });
+                body = usp.toString();
+            } else {
+                // APK/new: JSON
+                perAttemptHeaders['Content-Type'] = 'application/json';
+                body = JSON.stringify(payload);
+            }
+
+            console.log(`📤 Tentative #${i + 1} (${label}) vers ${url} | headers:`, perAttemptHeaders, '| body:', isLegacy ? body : payload);
             const resp = await fetch(url, {
                 method: 'POST',
-                headers,
-                body: JSON.stringify(payload)
+                headers: perAttemptHeaders,
+                body
             });
             console.log(`📡 Statut réponse (${label}):`, resp.status);
 
