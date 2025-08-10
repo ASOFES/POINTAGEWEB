@@ -1,219 +1,139 @@
-# TimeSheet Employee App - Web Mobile
+# 📱 Timesheet App - Version Web Multi-Pages
 
-## 📱 Description
+Application web moderne de gestion de pointage par QR code avec interface multi-pages et design responsive.
 
-Application web mobile pour la gestion des pointages employés, conforme au style de l'APK Flutter existant. Cette version web permet aux employés de scanner des QR codes pour pointer leur entrée/sortie directement depuis leur navigateur mobile.
+## 🚀 Fonctionnalités
 
-## ✨ Fonctionnalités
-
-### 🔐 Authentification
-- Page de connexion sécurisée
+### ✅ Authentification Sécurisée
+- Page de connexion dédiée
 - Gestion des tokens JWT
-- Validation automatique des sessions
-- Comptes de démonstration inclus
+- Protection des routes
+- Validation des identifiants
 
-### 📷 Scanner QR
-- Scanner QR code avec la caméra mobile
-- Support HTTPS obligatoire pour la caméra
-- Détection automatique des codes QR
-- Validation des pointages en temps réel
+### 📷 Scanner QR Code
+- Scanner intégré avec `html5-qrcode`
+- Protection anti-scan multiple
+- Validation cross-utilisateur
+- Arrêt automatique de la caméra
+- Messages de succès/erreur clairs
+- Indicateurs de statut GPS et Caméra
 
-### 📊 Tableau de bord
-- Interface moderne et responsive
-- Navigation par onglets
-- Actions principales en cartes
-- Affichage des pointages récents
+### 📊 Tableau de Bord
+- Vue d'ensemble des statistiques
+- Navigation vers toutes les fonctionnalités
+- Informations utilisateur
+- Activité récente
 
-### 📈 Historique
-- Liste des pointages avec filtres
-- Export CSV des données
-- Actualisation en temps réel
-- Statistiques des heures travaillées
+### 📋 Historique des Pointages
+- Filtres avancés (date, type, site)
+- Tableau paginé
+- Export CSV
+- Statistiques détaillées
 
-### 👤 Profil utilisateur
+### 👤 Profil Utilisateur
 - Informations personnelles
-- Gestion des données utilisateur
+- Statistiques de pointage
+- Actions de gestion
 - Déconnexion sécurisée
 
-## 🚀 Installation
+## 🛠️ Technologies Utilisées
 
-### Prérequis
-- Serveur web avec support HTTPS
-- API backend pour l'authentification et les pointages
-- Navigateur moderne avec support WebRTC
+- **Frontend**: HTML5, CSS3, JavaScript ES6+
+- **Scanner QR**: html5-qrcode v2.3.8
+- **API**: Azure Web App (REST)
+- **Stockage**: localStorage pour la session
+- **Design**: CSS Grid, Flexbox, Responsive Design
 
-### Configuration
+## 📁 Structure des Fichiers
 
-1. **Cloner le repository**
+```
+timesheet-web-secure/
+├── login.html          # Page de connexion
+├── dashboard.html      # Tableau de bord principal
+├── scanner.html        # Scanner QR code
+├── history.html        # Historique des pointages
+├── profile.html        # Profil utilisateur
+├── index.html          # Page d'accueil/redirection
+├── auth.js             # Logique d'authentification
+├── app.js              # Fonctionnalités principales
+└── README.md           # Documentation
+```
+
+## 🔧 Installation et Utilisation
+
+### 1. Cloner le Repository
 ```bash
 git clone https://github.com/ASOFES/POINTAGEWEB.git
 cd POINTAGEWEB
 ```
 
-2. **Configurer l'API**
-Modifiez le fichier `auth.js` et remplacez l'URL de l'API :
-```javascript
-this.API_BASE_URL = 'https://votre-api-domain.com/api';
-```
+### 2. Ouvrir l'Application
+- Ouvrir `index.html` dans un navigateur moderne
+- Ou déployer sur un serveur web statique
 
-3. **Déployer sur un serveur HTTPS**
-```bash
-# Exemple avec un serveur local HTTPS
-python -m http.server 8000 --bind 0.0.0.0
-# Ou utiliser un serveur comme nginx, Apache, etc.
-```
+### 3. Se Connecter
+- Utiliser les identifiants fournis
+- L'application redirigera automatiquement vers le tableau de bord
 
-## 📁 Structure des fichiers
+## 🔐 Sécurité
 
-```
-POINTAGEWEB/
-├── index.html          # Page principale de l'application
-├── login.html          # Page de connexion
-├── auth.js             # Gestion de l'authentification
-├── app.js              # Logique principale de l'application
-├── README.md           # Documentation
-└── .gitignore          # Fichiers à ignorer
-```
-
-## 🔧 Configuration API
-
-### Endpoints requis
-
-#### Authentification
-- `POST /Auth/login` - Connexion utilisateur
-- `GET /Auth/validate` - Validation du token
-
-#### Pointages
-- `POST /Timesheet` - Créer un pointage
-- `GET /Timesheet` - Récupérer l'historique
-
-### Format des données
-
-#### Login
-```json
-{
-  "Email": "user@example.com",
-  "password": "password123"
-}
-```
-
-#### Pointage
-```json
-{
-  "code": "QR_CODE_DATA",
-  "details": "Pointage entrée",
-  "start": "2024-01-15T08:00:00Z",
-  "planningId": 5,
-  "timesheetTypeId": 1
-}
-```
-
-## 📱 Utilisation
-
-### 1. Accès à l'application
-- Ouvrir `https://votre-domaine.com` dans un navigateur mobile
-- Se connecter avec ses identifiants
-
-### 2. Scanner un QR code
-- Aller dans l'onglet "Scanner QR"
-- Autoriser l'accès à la caméra
-- Pointer le QR code dans le cadre
-- Le pointage est automatiquement enregistré
-
-### 3. Consulter l'historique
-- Aller dans l'onglet "Historique"
-- Voir tous ses pointages
-- Exporter les données en CSV
-
-## 🛡️ Sécurité
-
-### HTTPS obligatoire
-- L'application nécessite HTTPS pour accéder à la caméra
-- Fonctionne en localhost pour les tests
+### Protection Anti-Duplication
+- Vérification des QR codes déjà utilisés
+- Protection contre les scans multiples
+- Validation cross-utilisateur des QR codes
 
 ### Authentification
-- Tokens JWT pour la sécurité
-- Validation automatique des sessions
-- Déconnexion automatique si token expiré
+- Tokens JWT sécurisés
+- Vérification de session à chaque page
+- Redirection automatique si non connecté
 
-### Permissions caméra
-- Demande explicite des permissions
-- Gestion des erreurs de permissions
-- Messages d'aide pour l'utilisateur
+## 📱 Compatibilité
 
-## 🎨 Design
+- **Desktop**: Chrome, Firefox, Safari, Edge
+- **Mobile**: iOS Safari, Chrome Android, Samsung Internet
+- **Navigateurs anciens**: Fallbacks CSS et JavaScript inclus
 
-### Style conforme à l'APK Flutter
-- Couleurs : #1976D2 (bleu principal)
-- Interface moderne avec animations
-- Responsive design pour mobile
-- Navigation intuitive
+## 🌐 Déploiement
 
-### Composants
-- Cartes d'actions principales
-- Navigation par onglets
-- Messages de statut colorés
-- Indicateurs de chargement
-
-## 🧪 Tests
-
-### Comptes de démonstration
-- `test@test.com` / `test`
-- `admin@example.com` / `admin123`
-- `user@example.com` / `user123`
-
-### Test du scanner
-- Utiliser des QR codes de test
-- Vérifier les permissions caméra
-- Tester sur différents appareils
-
-## 🔄 Déploiement
+### Netlify (Recommandé)
+1. Connecter le repository GitHub
+2. Build automatique à chaque push
+3. HTTPS et CDN inclus
 
 ### GitHub Pages
-1. Pousser le code sur GitHub
-2. Activer GitHub Pages dans les paramètres
-3. L'application sera accessible via `https://username.github.io/POINTAGEWEB`
+1. Activer GitHub Pages dans les paramètres
+2. Sélectionner la branche `main`
+3. Accès via `https://username.github.io/repository`
 
-### Vercel
-1. Connecter le repository GitHub à Vercel
-2. Déployer automatiquement
-3. URL personnalisée disponible
+## 🔍 Dépannage
 
-### Netlify
-1. Drag & drop du dossier sur Netlify
-2. Configuration automatique
-3. URL personnalisée disponible
+### Problèmes de Scanner
+- Vérifier les permissions caméra
+- Actualiser la page si nécessaire
+- Vérifier la connexion internet
 
-## 🐛 Dépannage
-
-### Problèmes courants
-
-#### Caméra non accessible
-- Vérifier que le site est en HTTPS
-- Autoriser les permissions caméra
-- Tester sur un autre navigateur
-
-#### Erreur de connexion API
-- Vérifier l'URL de l'API dans `auth.js`
-- Contrôler la connectivité réseau
-- Vérifier les logs du serveur
-
-#### Scanner QR ne fonctionne pas
-- Vérifier que la bibliothèque est chargée
-- Contrôler les permissions caméra
-- Tester avec un QR code valide
+### Problèmes de Connexion
+- Vérifier les identifiants
+- Vider le cache du navigateur
+- Vérifier l'accessibilité de l'API
 
 ## 📞 Support
 
 Pour toute question ou problème :
-- Créer une issue sur GitHub
-- Contacter l'équipe de développement
-- Consulter la documentation de l'API
+1. Vérifier la console du navigateur
+2. Consulter les logs de l'API
+3. Contacter l'équipe de développement
 
-## 📄 Licence
+## 🔄 Mises à Jour
 
-Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
+L'application est régulièrement mise à jour avec :
+- Corrections de bugs
+- Améliorations de sécurité
+- Nouvelles fonctionnalités
+- Optimisations de performance
 
 ---
 
-**Développé avec ❤️ pour ASOFES**
+**Version**: 2.0.0  
+**Dernière mise à jour**: Août 2025  
+**Statut**: Production Ready ✅

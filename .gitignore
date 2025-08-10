@@ -1,38 +1,41 @@
-# Django
-*.log
-*.pot
-*.pyc
-__pycache__/
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-
-# Environment variables
-.env
-.venv
-env/
-venv/
-
-# OS
+# Fichiers système
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
+desktop.ini
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Fichiers de build
+build/
+dist/
+out/
+.next/
+.nuxt/
+
+# Dépendances
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Variables d'environnement
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Static files (will be collected in production)
-/staticfiles/
-/staticfiles_build/
-
-# Sensitive files
-*.pem
-*.key
+# OS
+*.orig
+*.rej
