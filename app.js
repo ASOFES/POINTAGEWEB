@@ -519,6 +519,9 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
 
         // Tentatives séquentielles: d'abord /timesheets + apkPayload, puis /Timesheet + legacyPayload si 404
         const attempts = [
+            // APK/new endpoints en JSON (même logique que l'APK mobile)
+            { url: `${API_BASE_URL}/timesheets`, payload: apkPayload, label: 'APK JSON /timesheets', contentType: 'json' },
+            { url: `${API_BASE_URL}/timesheet`, payload: apkPayload, label: 'APK JSON /timesheet', contentType: 'json' },
             // Legacy: diverses variantes de Content-Type pour éviter 415
             { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy JSON /Timesheet', contentType: 'json' },
             { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy JSON-Charset /Timesheet', contentType: 'json-charset' },
@@ -526,10 +529,7 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
             { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy FORM /Timesheet', contentType: 'form' },
             // Variante pluriel legacy
             { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy JSON /Timesheets', contentType: 'json' },
-            { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy FORM /Timesheets', contentType: 'form' },
-            // APK/new endpoints en JSON
-            { url: `${API_BASE_URL}/timesheets`, payload: apkPayload, label: 'APK JSON /timesheets', contentType: 'json' },
-            { url: `${API_BASE_URL}/timesheet`, payload: apkPayload, label: 'APK JSON /timesheet', contentType: 'json' }
+            { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy FORM /Timesheets', contentType: 'form' }
         ];
 
         for (let i = 0; i < attempts.length; i++) {
