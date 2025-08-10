@@ -519,21 +519,22 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
 
         // Tentatives séquentielles: d'abord /timesheets + apkPayload, puis /Timesheet + legacyPayload si 404
         const attempts = [
-            { url: `${API_BASE_URL}/timesheets`, payload: apkPayload, label: 'APK /timesheets' },
-            { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy /Timesheet' },
-            { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy /Timesheets' },
-            { url: `${API_BASE_URL}/timesheet`, payload: apkPayload, label: 'APK /timesheet' }
+            // Legacy: tente JSON d'abord (PascalCase), puis form si nécessaire
+            { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy JSON /Timesheet', contentType: 'json' },
+            { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy FORM /Timesheet', contentType: 'form' },
+            { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy JSON /Timesheets', contentType: 'json' },
+            // APK/new endpoints en JSON
+            { url: `${API_BASE_URL}/timesheets`, payload: apkPayload, label: 'APK JSON /timesheets', contentType: 'json' },
+            { url: `${API_BASE_URL}/timesheet`, payload: apkPayload, label: 'APK JSON /timesheet', contentType: 'json' }
         ];
 
         for (let i = 0; i < attempts.length; i++) {
-            const { url, payload, label } = attempts[i];
-            const isLegacy = label.startsWith('Legacy');
+            const { url, payload, label, contentType } = attempts[i];
 
-            // Préparer en-têtes et corps selon endpoint
+            // Préparer en-têtes et corps selon contentType
             const perAttemptHeaders = { ...headers };
             let body;
-            if (isLegacy) {
-                // L'API legacy attend souvent du x-www-form-urlencoded
+            if (contentType === 'form') {
                 perAttemptHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
                 const usp = new URLSearchParams();
                 Object.entries(payload).forEach(([k, v]) => {
@@ -541,7 +542,6 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
                 });
                 body = usp.toString();
             } else {
-                // APK/new: JSON
                 perAttemptHeaders['Content-Type'] = 'application/json';
                 body = JSON.stringify(payload);
             }
@@ -564,9 +564,9 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
                 throw new Error('Non autorisé (401). Veuillez vous reconnecter pour rafraîchir votre session.');
             }
 
-            if (resp.status === 404 && i < attempts.length - 1) {
+            if ((resp.status === 404 || resp.status === 415) && i < attempts.length - 1) {
                 // On tente le fallback
-                console.warn(`⚠️ Endpoint non trouvé (${url}), tentative fallback...`);
+                console.warn(`⚠️ Fallback (status ${resp.status}) depuis ${label} -> tentative suivante...`);
                 continue;
             }
 
