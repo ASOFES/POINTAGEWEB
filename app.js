@@ -519,10 +519,14 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
 
         // Tentatives séquentielles: d'abord /timesheets + apkPayload, puis /Timesheet + legacyPayload si 404
         const attempts = [
-            // Legacy: tente JSON d'abord (PascalCase), puis form si nécessaire
+            // Legacy: diverses variantes de Content-Type pour éviter 415
             { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy JSON /Timesheet', contentType: 'json' },
+            { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy JSON-Charset /Timesheet', contentType: 'json-charset' },
+            { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy TEXTJSON /Timesheet', contentType: 'textjson' },
             { url: `${API_BASE_URL}/Timesheet`, payload: legacyPayload, label: 'Legacy FORM /Timesheet', contentType: 'form' },
+            // Variante pluriel legacy
             { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy JSON /Timesheets', contentType: 'json' },
+            { url: `${API_BASE_URL}/Timesheets`, payload: legacyPayload, label: 'Legacy FORM /Timesheets', contentType: 'form' },
             // APK/new endpoints en JSON
             { url: `${API_BASE_URL}/timesheets`, payload: apkPayload, label: 'APK JSON /timesheets', contentType: 'json' },
             { url: `${API_BASE_URL}/timesheet`, payload: apkPayload, label: 'APK JSON /timesheet', contentType: 'json' }
@@ -532,7 +536,7 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
             const { url, payload, label, contentType } = attempts[i];
 
             // Préparer en-têtes et corps selon contentType
-            const perAttemptHeaders = { ...headers };
+            const perAttemptHeaders = { ...headers, 'Accept': 'application/json, text/plain, */*' };
             let body;
             if (contentType === 'form') {
                 perAttemptHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
@@ -541,6 +545,12 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
                     if (v !== undefined && v !== null) usp.append(k, String(v));
                 });
                 body = usp.toString();
+            } else if (contentType === 'json-charset') {
+                perAttemptHeaders['Content-Type'] = 'application/json; charset=utf-8';
+                body = JSON.stringify(payload);
+            } else if (contentType === 'textjson') {
+                perAttemptHeaders['Content-Type'] = 'text/json';
+                body = JSON.stringify(payload);
             } else {
                 perAttemptHeaders['Content-Type'] = 'application/json';
                 body = JSON.stringify(payload);
