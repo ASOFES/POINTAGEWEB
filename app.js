@@ -492,18 +492,20 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
             })
         };
 
+        // Legacy API: exige un champ Code et une chaine details (<=256)
+        const legacyDetails = (() => {
+            const base = `QR web scan; uid=${currentUser?.id}; pid=${planningId}; ts=${Date.now()}; ua=${navigator.userAgent}`;
+            return base.length > 250 ? base.slice(0, 250) : base;
+        })();
+
         const legacyPayload = {
             employeeId: currentUser?.id,
             siteId: siteId,
             planningId: planningId,
             timesheetTypeId: timesheetTypeId,
             start: new Date().toISOString(),
-            details: JSON.stringify({
-                qrData: qrData,
-                userAgent: navigator.userAgent,
-                timestamp: Date.now(),
-                code: uniqueCode
-            })
+            Code: uniqueCode,
+            details: legacyDetails
         };
         
         console.log('📤 Préparation envoi timesheet (formats APK + Legacy)');
