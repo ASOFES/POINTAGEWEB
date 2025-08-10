@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Timesheet - Pointage Sécurisé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .content {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section {
+            display: none;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .navigation {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px 10px;
+            border: none;
+            background: none;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-btn.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: white;
+        }
+
+        .nav-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .user-info h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .user-info p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .scanner-container {
+            text-align: center;
+        }
+
+        .scanner-video {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            border-radius: 12px;
+            border: 3px solid #e2e8f0;
+            margin-bottom: 20px;
+            background: #f8fafc;
+        }
+
+        .scanner-status {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-active {
+            background: #10b981;
+        }
+
+        .status-inactive {
+            background: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .message-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .message-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .message-info {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .message-warning {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+
+        .history-item {
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .history-item h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .history-item p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .modal p {
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-btn {
+                font-size: 12px;
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🕐 Timesheet Sécurisé</h1>
+            <p>Système de pointage par QR Code avec sécurité renforcée</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Navigation -->
+            <div class="navigation">
+                <button class="nav-btn active" onclick="showSection('login')">🔐 Connexion</button>
+                <button class="nav-btn" onclick="showSection('dashboard')">🏠 Tableau</button>
+                <button class="nav-btn" onclick="showSection('scanner')">📷 Scanner</button>
+                <button class="nav-btn" onclick="showSection('history')">📋 Historique</button>
+            </div>
+
+            <!-- Login Section -->
+            <div id="login-section" class="section active">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">Connexion</h2>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="votre@email.com" value="totoasofes22@gmail.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" placeholder="Votre mot de passe" value="admin123">
+                </div>
+
+                <button class="btn btn-primary" onclick="login()">Se connecter</button>
+                
+                <div id="login-message"></div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="section">
+                <div class="user-info">
+                    <h2 id="user-name">Utilisateur</h2>
+                    <p id="user-role">Employé</p>
+                    <p id="user-email">email@example.com</p>
+                </div>
+                
+                <div style="text-align: center;">
+                    <p style="color: #64748b; font-size: 16px;">Bienvenue sur votre espace de travail !</p>
+                </div>
+            </div>
+
+            <!-- Scanner Section -->
+            <div id="scanner-section" class="section">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Scanner QR Code</h2>
+                
+                <!-- Status indicators -->
+                <div class="scanner-status">
+                    <div class="status-item">
+                        <div class="status-dot" id="camera-status"></div>
+                        <span>Caméra</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot status-active" id="gps-status"></div>
+                        <span>GPS</span>
+                    </div>
+                </div>
+
+                <div class="scanner-container">
+                    <div id="qr-reader" class="scanner-video"></div>
+                    
+                    <button class="btn btn-primary" id="start-scan-btn" onclick="startScanner()">
+                        📷 Démarrer le Scanner
+                    </button>
+                    
+                    <button class="btn btn-danger hidden" id="stop-scan-btn" onclick="stopScanner()">
+                        ⏹️ Arrêter le Scanner
+                    </button>
+                </div>
+
+                <div id="scanner-message"></div>
+            </div>
+
+            <!-- History Section -->
+            <div id="history-section" class="section">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Historique des Pointages</h2>
+                
+                <button class="btn btn-secondary" onclick="loadHistory()">
+                    🔄 Actualiser l'historique
+                </button>
+                
+                <div id="history-list"></div>
+            </div>
+        </div>
+
+        <!-- Logout button -->
+        <div style="margin-top: 20px;">
+            <button class="btn btn-secondary hidden" id="logout-btn" onclick="logout()">
+                🚪 Déconnexion
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="success-title">🎉 Pointage Réussi !</h3>
+            <p id="success-message"></p>
+            <button class="btn btn-primary" onclick="closeModal('success-modal')">Fermer</button>
+            <button class="btn btn-secondary" onclick="closeModal('success-modal'); startScanner();">Nouveau Scan</button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="error-title">❌ Erreur</h3>
+            <p id="error-message"></p>
+            <button class="btn btn-primary" onclick="closeModal('error-modal')">Fermer</button>
+            <button class="btn btn-secondary" onclick="closeModal('error-modal'); startScanner();">Réessayer</button>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "name": "timesheet-web-secure",
+  "version": "2.0.0",
+  "description": "Système de pointage par QR Code avec sécurité renforcée",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server . -p 8000 -c-1",
+    "dev": "http-server . -p 8000 -c-1 --cors",
+    "build": "echo 'Build completed - Static site'",
+    "deploy:local": "./deploy.sh --local",
+    "deploy:netlify": "echo 'Déployer sur Netlify via drag & drop ou git'",
+    "deploy:vercel": "echo 'Déployer sur Vercel via vercel --prod'",
+    "deploy:github": "echo 'Déployer sur GitHub Pages via GitHub Actions'",
+    "test": "echo 'Tests à implémenter'",
+    "lint": "echo 'Linting à implémenter'"
+  },
+  "keywords": [
+    "timesheet",
+    "qr-code",
+    "pointage",
+    "security",
+    "web-app",
+    "pwa"
+  ],
+  "author": "ASOFES Team",
+  "email": "totoasofes22@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ASOFES/POINTAGEWEB.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ASOFES/POINTAGEWEB/issues"
+  },
+  "homepage": "https://github.com/ASOFES/POINTAGEWEB#readme",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "dependencies": {
+    "html5-qrcode": "^2.3.8"
+  }
+}
