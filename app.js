@@ -556,7 +556,9 @@ async function createTimesheet(siteId, planningId, timesheetTypeId, qrData) {
                 body = JSON.stringify(payload);
             }
 
-            console.log(`📤 Tentative #${i + 1} (${label}) vers ${url} | headers:`, perAttemptHeaders, '| body:', isLegacy ? body : payload);
+            // Log sécurisé du body selon contentType (évite la référence à isLegacy)
+            const bodyPreview = contentType === 'form' ? body : payload;
+            console.log(`📤 Tentative #${i + 1} (${label}) vers ${url} | headers:`, perAttemptHeaders, '| body:', bodyPreview);
             const resp = await fetch(url, {
                 method: 'POST',
                 headers: perAttemptHeaders,
