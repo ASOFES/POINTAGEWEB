@@ -418,6 +418,11 @@
 
                 // Générer un code unique pour le pointage
                 const uniqueCode = generateUniqueCode();
+                
+                // Vérifier que le code est valide
+                if (!uniqueCode || uniqueCode.trim() === '') {
+                    throw new Error('Erreur: Impossible de générer un code unique');
+                }
 
                 // Créer des détails raccourcis pour respecter la limite de 256 caractères
                 const details = {
@@ -429,7 +434,16 @@
                     lng: 0.0
                 };
 
-                const detailsJson = JSON.stringify(details);
+                // Convertir en JSON et vérifier la longueur
+                let detailsJson = JSON.stringify(details);
+                if (detailsJson.length > 256) {
+                    // Si trop long, créer une version raccourcie
+                    detailsJson = JSON.stringify({
+                        uid: currentUser.id,
+                        pid: planningId,
+                        ts: Date.now()
+                    });
+                }
 
                 // Créer le pointage avec la structure correcte
                 const timesheetData = {
@@ -439,6 +453,19 @@
                     planningId: planningId,
                     timesheetTypeId: timesheetTypeId
                 };
+
+                // Validation côté client avant envoi
+                if (!timesheetData.code || timesheetData.code.trim() === '') {
+                    throw new Error('Erreur: Le code est requis');
+                }
+                
+                if (!timesheetData.details || timesheetData.details.length > 256) {
+                    throw new Error('Erreur: Les détails doivent faire moins de 256 caractères');
+                }
+                
+                if (!timesheetData.planningId) {
+                    throw new Error('Erreur: L\'ID du planning est requis');
+                }
 
                 const response = await fetch(`${API_BASE_URL}/Timesheet`, {
                     method: 'POST',
@@ -551,7 +578,15 @@
             // Générer un code unique basé sur le timestamp et un nombre aléatoire
             const timestamp = Date.now();
             const random = Math.floor(Math.random() * 10000);
-            return `TS${timestamp}${random}`;
+            const code = `TS${timestamp}${random}`;
+            
+            // Vérification de sécurité
+            if (!code || code.length < 10) {
+                // Fallback si la génération échoue
+                return `TS${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
+            }
+            
+            return code;
         }
 
         function goBack() {
